@@ -1,0 +1,45 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Dependencies
+/vendor/
+/node_modules/
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+error_log
+
+# Cache
+*.cache
+.cache/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*~
+
+# Database
+*.sql
+*.sqlite
+*.db
+
+# Build files
+/dist/
+/build/
+
+# Configuration files with sensitive data
+backend/config/database.php 

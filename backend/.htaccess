@@ -1,0 +1,22 @@
+RewriteEngine On
+
+# Handle Authorization Header
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# API Routes
+RewriteRule ^api/auth/([^/]+)/?$ api/auth.php?action=$1 [QSA,L]
+RewriteRule ^api/dashboard/([^/]+)/?$ api/dashboard.php?action=$1 [QSA,L]
+RewriteRule ^api/clients/([^/]+)/?$ api/clients.php?action=$1 [QSA,L]
+RewriteRule ^api/clients/?$ api/clients.php [QSA,L]
+
+# Prevent directory listing
+Options -Indexes
+
+# Set default character set
+AddDefaultCharset UTF-8
+
+# Enable CORS
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type, Authorization" 

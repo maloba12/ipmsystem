@@ -6,8 +6,107 @@ require_once __DIR__ . '/../helpers/functions.php';
 class DashboardController {
     private $db;
 
-    public function __construct() {
-        $this->db = getDBConnection();
+    public function __construct($db) {
+        $this->db = $db;
+    }
+
+    public function getStats() {
+        try {
+            // Get total policies
+            $stmt = $this->db->query("SELECT COUNT(*) FROM policies");
+            $totalPolicies = $stmt->fetchColumn();
+
+            // Get pending claims
+            $stmt = $this->db->query("SELECT COUNT(*) FROM claims WHERE status = 'pending'");
+            $pendingClaims = $stmt->fetchColumn();
+
+            // Get monthly premium
+            $stmt = $this->db->query("
+                SELECT COALESCE(SUM(premium), 0) 
+                FROM policies 
+                WHERE status = 'active' 
+                AND MONTH(start_date) = MONTH(CURRENT_DATE())
+                AND YEAR(start_date) = YEAR(CURRENT_DATE())
+            ");
+            $monthlyPremium = $stmt->fetchColumn();
+
+            // Get active clients
+            $stmt = $this->db->query("
+                SELECT COUNT(DISTINCT client_id) 
+                FROM policies 
+                WHERE status = 'active'
+            ");
+            $activeClients = $stmt->fetchColumn();
+
+            // Get policy distribution
+            $stmt = $this->db->query("
+                SELECT type, COUNT(*) as count 
+                FROM policies 
+                WHERE status = 'active' 
+                GROUP BY type
+            ");
+            $policyDistribution = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Get claims overview (last 6 months)
+            $stmt = $this->db->query("
+                SELECT 
+                    DATE_FORMAT(created_at, '%Y-%m') as month,
+                    COUNT(*) as count,
+                    SUM(amount) as total_amount
+                FROM claims
+                WHERE created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
+                GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+                ORDER BY month
+            ");
+            $claimsOverview = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            echo json_encode([
+                'stats' => [
+                    'totalPolicies' => $totalPolicies,
+                    'pendingClaims' => $pendingClaims,
+                    'monthlyPremium' => $monthlyPremium,
+                    'activeClients' => $activeClients
+                ],
+                'policyDistribution' => $policyDistribution,
+                'claimsOverview' => $claimsOverview
+            ]);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['message' => 'An error occurred while fetching dashboard statistics']);
+        }
+    }
+
+    public function getActivities() {
+        try {
+            $stmt = $this->db->query("
+                SELECT 
+                    a.*,
+                    u.name as user_name
+                FROM activities a
+                JOIN users u ON a.user_id = u.id
+                ORDER BY a.created_at DESC
+                LIMIT 10
+            ");
+            $activities = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            echo json_encode($activities);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['message' => 'An error occurred while fetching activities']);
+        }
+    }
+
+    public function logActivity($userId, $type, $description) {
+        try {
+            $stmt = $this->db->prepare("
+                INSERT INTO activities (user_id, type, description)
+                VALUES (?, ?, ?)
+            ");
+            $stmt->execute([$userId, $type, $description]);
+        } catch (Exception $e) {
+            // Log error but don't throw it
+            error_log("Failed to log activity: " . $e->getMessage());
+        }
     }
 
     public function getOverview() {

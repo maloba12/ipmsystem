@@ -1,0 +1,23 @@
+{
+    "name": "zamsure/ipmsystem",
+    "description": "Insurance Policy Management System",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "ext-pdo": "*",
+        "ext-json": "*",
+        "vlucas/phpdotenv": "^5.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "backend/"
+        }
+    },
+    "authors": [
+        {
+            "name": "ZamSure Team",
+            "email": "admin@zamsure.com"
+        }
+    ],
+    "minimum-stability": "stable"
+} 

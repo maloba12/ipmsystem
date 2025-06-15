@@ -3,11 +3,352 @@ require_once __DIR__ . '/../auth/middleware.php';
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../helpers/functions.php';
 
+/**
+ * Report Controller
+ * 
+ * This controller handles all report-related API endpoints, including
+ * report generation, scheduling, and management.
+ */
 class ReportController {
     private $db;
+    private $report_generator;
+    private $data_collector;
+    private $scheduler;
 
-    public function __construct() {
-        $this->db = getDBConnection();
+    /**
+     * Constructor
+     * 
+     * @param PDO $db Database connection
+     */
+    public function __construct($db) {
+        $this->db = $db;
+        $this->report_generator = new ReportGenerator($db);
+        $this->data_collector = new ReportDataCollector($db);
+        $this->scheduler = new ReportScheduler($db, $this->report_generator, $this->data_collector);
+    }
+
+    /**
+     * Generate a report
+     * 
+     * @param array $request Request data
+     * @return array Response data
+     */
+    public function generateReport($request) {
+        try {
+            // Validate request
+            $this->validateReportRequest($request);
+
+            // Set date range
+            $this->data_collector->setDateRange(
+                $request['start_date'],
+                $request['end_date']
+            );
+
+            // Collect data based on report type
+            $data = $this->collectReportData($request['report_type'], $request['parameters'] ?? []);
+
+            // Generate report
+            $this->report_generator->setFormat($request['format'] ?? 'pdf');
+            $report_file = $this->report_generator->generate($data);
+
+            return [
+                'status' => 'success',
+                'message' => 'Report generated successfully',
+                'data' => [
+                    'report_file' => $report_file
+                ]
+            ];
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Schedule a report
+     * 
+     * @param array $request Request data
+     * @return array Response data
+     */
+    public function scheduleReport($request) {
+        try {
+            // Validate request
+            $this->validateScheduleRequest($request);
+
+            // Schedule report
+            $report_id = $this->scheduler->scheduleReport($request);
+
+            return [
+                'status' => 'success',
+                'message' => 'Report scheduled successfully',
+                'data' => [
+                    'report_id' => $report_id
+                ]
+            ];
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Update a scheduled report
+     * 
+     * @param array $request Request data
+     * @return array Response data
+     */
+    public function updateScheduledReport($request) {
+        try {
+            // Validate request
+            if (empty($request['report_id'])) {
+                throw new Exception('Report ID is required');
+            }
+            $this->validateScheduleRequest($request);
+
+            // Update report
+            $success = $this->scheduler->updateScheduledReport(
+                $request['report_id'],
+                $request
+            );
+
+            if (!$success) {
+                throw new Exception('Failed to update scheduled report');
+            }
+
+            return [
+                'status' => 'success',
+                'message' => 'Scheduled report updated successfully'
+            ];
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Delete a scheduled report
+     * 
+     * @param array $request Request data
+     * @return array Response data
+     */
+    public function deleteScheduledReport($request) {
+        try {
+            // Validate request
+            if (empty($request['report_id'])) {
+                throw new Exception('Report ID is required');
+            }
+
+            // Delete report
+            $success = $this->scheduler->deleteScheduledReport($request['report_id']);
+
+            if (!$success) {
+                throw new Exception('Failed to delete scheduled report');
+            }
+
+            return [
+                'status' => 'success',
+                'message' => 'Scheduled report deleted successfully'
+            ];
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Get scheduled reports
+     * 
+     * @param array $request Request data
+     * @return array Response data
+     */
+    public function getScheduledReports($request) {
+        try {
+            $filters = [];
+            
+            if (!empty($request['status'])) {
+                $filters['status'] = $request['status'];
+            }
+            
+            if (!empty($request['report_type'])) {
+                $filters['report_type'] = $request['report_type'];
+            }
+            
+            if (!empty($request['frequency'])) {
+                $filters['frequency'] = $request['frequency'];
+            }
+
+            $reports = $this->scheduler->getScheduledReports($filters);
+
+            return [
+                'status' => 'success',
+                'data' => $reports
+            ];
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Get report templates
+     * 
+     * @return array Response data
+     */
+    public function getReportTemplates() {
+        try {
+            $sql = "SELECT * FROM report_templates WHERE is_active = TRUE";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            $templates = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return [
+                'status' => 'success',
+                'data' => $templates
+            ];
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Get report recipients
+     * 
+     * @return array Response data
+     */
+    public function getReportRecipients() {
+        try {
+            $sql = "SELECT * FROM report_recipients WHERE is_active = TRUE";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            $recipients = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return [
+                'status' => 'success',
+                'data' => $recipients
+            ];
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Get report recipient groups
+     * 
+     * @return array Response data
+     */
+    public function getReportRecipientGroups() {
+        try {
+            $sql = "SELECT * FROM report_recipient_groups WHERE is_active = TRUE";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            $groups = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return [
+                'status' => 'success',
+                'data' => $groups
+            ];
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Validate report generation request
+     * 
+     * @param array $request Request data
+     * @throws Exception If validation fails
+     */
+    private function validateReportRequest($request) {
+        if (empty($request['report_type'])) {
+            throw new Exception('Report type is required');
+        }
+
+        if (empty($request['start_date'])) {
+            throw new Exception('Start date is required');
+        }
+
+        if (empty($request['end_date'])) {
+            throw new Exception('End date is required');
+        }
+
+        if (strtotime($request['start_date']) > strtotime($request['end_date'])) {
+            throw new Exception('Start date must be before end date');
+        }
+    }
+
+    /**
+     * Validate report scheduling request
+     * 
+     * @param array $request Request data
+     * @throws Exception If validation fails
+     */
+    private function validateScheduleRequest($request) {
+        $this->validateReportRequest($request);
+
+        if (empty($request['frequency'])) {
+            throw new Exception('Frequency is required');
+        }
+
+        if (!in_array($request['frequency'], ['daily', 'weekly', 'monthly', 'quarterly', 'yearly'])) {
+            throw new Exception('Invalid frequency');
+        }
+
+        if (empty($request['recipients'])) {
+            throw new Exception('Recipients are required');
+        }
+
+        if (!is_array($request['recipients'])) {
+            throw new Exception('Recipients must be an array');
+        }
+    }
+
+    /**
+     * Collect report data
+     * 
+     * @param string $report_type Report type
+     * @param array $parameters Report parameters
+     * @return array Report data
+     * @throws Exception If report type is invalid
+     */
+    private function collectReportData($report_type, $parameters) {
+        switch ($report_type) {
+            case 'financial_summary':
+                return $this->data_collector->collectFinancialSummary();
+            
+            case 'financial_transactions':
+                return $this->data_collector->collectFinancialTransactions();
+            
+            case 'policy_performance':
+                return $this->data_collector->collectPolicyPerformance();
+            
+            case 'client_portfolio':
+                if (empty($parameters['client_id'])) {
+                    throw new Exception('Client ID is required for client portfolio report');
+                }
+                return $this->data_collector->collectClientPortfolio($parameters['client_id']);
+            
+            default:
+                throw new Exception("Unknown report type: {$report_type}");
+        }
     }
 
     public function getFinancialReport() {

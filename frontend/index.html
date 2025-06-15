@@ -3,587 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPMS UI Prototypes - ZamSure Insurance</title>
-    <!-- Include Chart.js for Reports screen -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Include CSS file -->
+    <title>ZamSure Insurance - IPMS</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="prototype-container">
-        <div class="header">
-            <h1>ZamSure Insurance IPMS</h1>
-            <p>Insurance Policy Management System - UI Prototypes</p>
-        </div>
-
-        <div class="nav-tabs" role="tablist">
-            <button class="tab active" data-screen="login" aria-selected="true">Login Page</button>
-            <button class="tab" data-screen="dashboard" aria-selected="false">Dashboard</button>
-            <button class="tab" data-screen="client-form" aria-selected="false">Client Registration</button>
-            <button class="tab" data-screen="policy-form" aria-selected="false">Policy Management</button>
-            <button class="tab" data-screen="claims" aria-selected="false">Claims Tracking</button>
-            <button class="tab" data-screen="reports" aria-selected="false">Reports</button>
-        </div>
-
-        <!-- Login Screen -->
-        <div class="screen active" id="login">
-            <div class="login-container">
-                <div class="login-header">
-                    <div class="logo">ZS</div>
-                    <h2>ZamSure Insurance</h2>
-                    <p style="color: #6c757d; margin-top: 10px;">Policy Management System</p>
-                </div>
-                
-                <form id="login-form" novalidate>
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" class="form-control" id="username" placeholder="Enter your username" required aria-describedby="username-error">
-                        <div id="username-error" class="error-message">Username is required</div>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" class="form-control" id="password" placeholder="Enter your password" required aria-describedby="password-error">
-                        <div id="password-error" class="error-message">Password is required</div>
-                    </div>
-                    <div class="selector">
-                        <label for="role">Login As</label>
-                        <select class="role" id="role" aria-label="Select login role">
-                            <option value="admin">Administrator</option>
-                            <option value="agent">Insurance Agent</option>
-                            <option value="claims">Claims Officer</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Sign In</button>
-                </form>
-                
-                <div class="form-group">
-                    <div style="text-align: center; margin-top: 20px; color: #999;">
-                        <small>Forgot password? Contact your administrator</small>
-                    </div>
-                </div>
+    <div class="app-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">ZS</div>
+                <h1>ZamSure IPMS</h1>
             </div>
-        </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="#" class="nav-link active" data-page="dashboard">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link" data-page="clients">
+                            <i class="fas fa-users"></i>
+                            <span>Clients</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link" data-page="policies">
+                            <i class="fas fa-file-contract"></i>
+                            <span>Policies</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link" data-page="claims">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>Claims</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link" data-page="reports">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    <li class="admin-only" style="display: none;">
+                        <a href="#" class="nav-link" data-page="agents">
+                            <i class="fas fa-user-tie"></i>
+                            <span>Agents</span>
+                        </a>
+                    </li>
+                    <li class="admin-only" style="display: none;">
+                        <a href="#" class="nav-link" data-page="settings">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
 
-        <!-- Dashboard Screen -->
-        <div class="screen" id="dashboard">
-            <div class="dashboard">
-                <div class="title">
-                    <h1>Dashboard</h1>
-                    <p class="welcome-text">Welcome back, Administrator</p>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button id="sidebar-toggle" class="sidebar-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2 id="page-title">Dashboard</h2>
                 </div>
-                <div class="user-details">
-                    <div class="user-image">
-                        <div class="avatar">AD</div>
-                        <div>
-                            <div style="font-weight: bold;">Admin User</div>
-                            <div style="color: #999; font-size: 12px;">Last login time: Today at 9:25 AM</div>
+                <div class="header-right">
+                    <div class="user-menu">
+                        <div class="user-info">
+                            <span id="user-name">Loading...</span>
+                            <span id="user-role" class="user-role">Loading...</span>
+                        </div>
+                        <div class="user-avatar" id="user-avatar">AD</div>
+                        <div class="dropdown-menu">
+                            <a href="#" data-page="profile"><i class="fas fa-user"></i> Profile</a>
+                            <a href="#" data-page="settings"><i class="fas fa-cog"></i> Settings</a>
+                            <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
                         </div>
                     </div>
                 </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Login Screen (Initial View) -->
+                <div id="login-screen" class="screen active">
+                    <div class="login-container">
+                        <div class="login-header">
+                            <div class="logo">ZS</div>
+                            <h2>ZamSure Insurance</h2>
+                            <p>Insurance Policy Management System</p>
+                        </div>
+                        
+                        <form id="login-form" novalidate>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                                <div class="error-message" id="email-error"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <div class="error-message" id="password-error"></div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Sign In</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Dashboard Screen -->
+                <div id="dashboard-screen" class="screen">
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-file-contract"></i></div>
+                            <div class="stat-info">
+                                <h3>Total Policies</h3>
+                                <p id="total-policies">Loading...</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-clipboard-list"></i></div>
+                            <div class="stat-info">
+                                <h3>Pending Claims</h3>
+                                <p id="pending-claims">Loading...</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
+                            <div class="stat-info">
+                                <h3>Monthly Premium</h3>
+                                <p id="monthly-premium">Loading...</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-info">
+                                <h3>Active Clients</h3>
+                                <p id="active-clients">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-charts">
+                        <div class="chart-container">
+                            <h3>Policy Distribution</h3>
+                            <canvas id="policy-chart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h3>Claims Overview</h3>
+                            <canvas id="claims-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="recent-activities">
+                        <h3>Recent Activities</h3>
+                        <div class="activity-list" id="activity-list">
+                            <!-- Activities will be loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other screens will be loaded dynamically -->
             </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-title">1,256</div>
-                    <div>Total Policies</div>
-                </div>
-                <div class="stat-card" style="background: linear-gradient(135deg, #ff6b6b, #ee5a24);">
-                    <div class="stat-title">23</div>
-                    <div>Pending Claims</div>
-                </div>
-                <div class="stat-card" style="background: linear-gradient(135deg, #4ecdc4, #44a08d);">
-                    <div class="stat-title">K 2,450,000</div>
-                    <div>Monthly Premium</div>
-                </div>
-                <div class="stat-card" style="background: linear-gradient(135deg, #a8f9ea, #ffffff);">
-                    <div class="stat-title" style="color: #333;">856</div>
-                    <div style="color: #333;">Active Clients</div>
-                </div>
-            </div>
-
-            <h3 class="section-title">Quick Actions</h3>
-            <div class="quick-actions">
-                <div class="action-button">
-                    <a href="#client-form" class="action-btn" onclick="showScreen('client-form')">
-                        <div class="icon">👤</div>
-                        <div class="title"><strong>New Client</strong></div>
-                        <div class="description">Add new client</div>
-                    </a>
-                </div>
-                <div class="action-button">
-                    <a href="#policy-details" class="action-btn" onclick="showScreen('policy-form')">
-                        <div class="icon">📋</div>
-                        <div class="title"><strong>Create Policy</strong></div>
-                        <div class="description">New insurance policy</div>
-                    </a>
-                </div>
-                <div class="action-button">
-                    <a href="#claims" class="action-btn" onclick="showScreen('claims')">
-                        <div class="icon">🔍</div>
-                        <div class="title"><strong>Process Claim</strong></div>
-                        <div class="description">Handle insurance claims</div>
-                    </a>
-                </div>
-                <div class="action-button">
-                    <div class="action-btn">
-                        <div class="icon">💰</div>
-                        <div class="title"><strong>Premium</strong></div>
-                        <div class="description">Premium payments</div>
-                    </div>
-                </div>
-                <div class="action-button">
-                    <a href="#reports" class="action-btn" onclick="showScreen('reports')">
-                        <div class="icon">📊</div>
-                        <div class="title"><strong>Insights</strong></div>
-                        <div class="description">Analytics & insights</div>
-                    </a>
-                </div>
-                <div class="action-button">
-                    <div class="action-btn">
-                        <div class="icon">⚙️</div>
-                        <div class="title"><strong>Settings</strong></div>
-                        <div class="description">Configure system</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="alert">
-                <strong>Alert:</strong> 12 policies will expire within the next month. Review expiration report for details.
-            </div>
-        </div>
-
-        <!-- Client Registration Form -->
-        <div class="screen hidden p-8 min-h-[700px] bg-white" id="client-form">
-            <div class="max-w-4xl mx-auto">
-                <h2 class="text-2xl font-bold text-gray-800 mb-8">New Client Registration</h2>
-                
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Personal Details</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label for="first-name" class="block mb-2 font-medium text-gray-700">First Name *</label>
-                            <input type="text" id="first-name" name="first-name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter first name" required>
-                        </div>
-                        <div>
-                            <label for="last-name" class="block mb-2 font-medium text-gray-700">Surname *</label>
-                            <input type="text" id="last-name" name="last-name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter last name" required>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label for="dob" class="block mb-2 font-medium text-gray-700">Date of Birth *</label>
-                            <input type="date" id="dob" name="dob" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-                        <div>
-                            <label for="gender" class="block mb-2 font-medium text-gray-700">Gender</label>
-                            <select id="gender" name="gender" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="">Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="national-id" class="block mb-2 font-medium text-gray-700">National ID/Passport *</label>
-                            <input type="text" id="national-id" name="national-id" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter ID number" required>
-                        </div>
-                        <div>
-                            <label for="marital-status" class="block mb-2 font-medium text-gray-700">Marital Status</label>
-                            <select id="marital-status" name="marital-status" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="">Select Status</option>
-                                <option value="single">Single</option>
-                                <option value="married">Married</option>
-                                <option value="divorced">Divorced</option>
-                                <option value="widowed">Widowed</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Contact Information</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label for="email" class="block mb-2 font-medium text-gray-700">Email Address *</label>
-                            <input type="email" id="email" name="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter email address" required>
-                        </div>
-                        <div>
-                            <label for="phone" class="block mb-2 font-medium text-gray-700">Phone Number *</label>
-                            <input type="tel" id="phone" name="phone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter phone number" required>
-                        </div>
-                    </div>
-                    <div class="mb-6">
-                        <label for="address" class="block mb-2 font-medium text-gray-700">Physical Address *</label>
-                        <textarea id="address" name="address" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter full address" required></textarea>
-                    </div>
-                </div>
-
-                <div class="flex justify-end space-x-4">
-                    <button type="button" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
-                    <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Register Client</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Policy Management Form -->
-        <div class="screen hidden p-8 min-h-[700px] bg-white" id="policy-form">
-            <div class="max-w-4xl mx-auto">
-                <h2 class="text-2xl font-bold text-gray-800 mb-8">Create New Policy</h2>
-                
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Policy Details</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label for="policy-type" class="block mb-2 font-medium text-gray-700">Policy Type *</label>
-                            <select id="policy-type" name="policy-type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                <option value="">Select Policy Type</option>
-                                <option value="auto">Auto Insurance</option>
-                                <option value="home">Home Insurance</option>
-                                <option value="life">Life Insurance</option>
-                                <option value="health">Health Insurance</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="client-select" class="block mb-2 font-medium text-gray-700">Client *</label>
-                            <select id="client-select" name="client-select" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                <option value="">Select Client</option>
-                                <option value="client1">John Doe</option>
-                                <option value="client2">Jane Smith</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label for="coverage-amount" class="block mb-2 font-medium text-gray-700">Coverage Amount *</label>
-                            <input type="number" id="coverage-amount" name="coverage-amount" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter amount" required>
-                        </div>
-                        <div>
-                            <label for="premium-amount" class="block mb-2 font-medium text-gray-700">Premium Amount *</label>
-                            <input type="number" id="premium-amount" name="premium-amount" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter premium" required>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="start-date" class="block mb-2 font-medium text-gray-700">Start Date *</label>
-                            <input type="date" id="start-date" name="start-date" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                        </div>
-                        <div>
-                            <label for="end-date" class="block mb-2 font-medium text-gray-700">End Date *</label>
-                            <input type="date" id="end-date" name="end-date" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex justify-end space-x-4">
-                    <button type="button" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
-                    <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Create Policy</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Claims Tracking -->
-        <div class="screen hidden p-8 min-h-[700px] bg-white" id="claims">
-            <div class="max-w-6xl mx-auto">
-                <h2 class="text-2xl font-bold text-gray-800 mb-8">Claims Tracking</h2>
-                
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Record New Claim</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label for="claim-policy" class="block mb-2 font-medium text-gray-700">Policy Number *</label>
-                            <select id="claim-policy" name="claim-policy" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                <option value="">Select Policy</option>
-                                <option value="POL-2025-001">POL-2025-001</option>
-                                <option value="POL-2025-002">POL-2025-002</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="claim-type" class="block mb-2 font-medium text-gray-700">Claim Type *</label>
-                            <select id="claim-type" name="claim-type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                <option value="">Select Claim Type</option>
-                                <option value="accident">Accident</option>
-                                <option value="theft">Theft</option>
-                                <option value="damage">Property Damage</option>
-                                <option value="medical">Medical</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mb-6">
-                        <label for="claim-description" class="block mb-2 font-medium text-gray-700">Claim Description *</label>
-                        <textarea id="claim-description" name="claim-description" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Describe the incident in detail" required></textarea>
-                    </div>
-                    <div class="mb-6">
-                        <label for="claim-amount" class="block mb-2 font-medium text-gray-700">Claim Amount *</label>
-                        <input type="number" id="claim-amount" name="claim-amount" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter claim amount" required>
-                    </div>
-                    <div class="flex justify-end space-x-4">
-                        <button type="button" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
-                        <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Submit Claim</button>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Claims</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Claim ID</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Policy</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">CLM-2025-001</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">POL-2025-001</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">John Doe</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Auto Accident</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">K 45,000</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-05-15</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Approved</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                        <button class="text-blue-600 hover:text-blue-900">View</button>
-                                        <button class="text-red-600 hover:text-red-900">Edit</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">CLM-2025-002</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">POL-2025-002</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Jane Smith</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Property Damage</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">K 89,000</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-05-20</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Rejected</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                        <button class="text-blue-600 hover:text-blue-900">View</button>
-                                        <button class="text-red-600 hover:text-red-900">Appeal</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Reports Section -->
-        <div class="screen hidden p-8 min-h-[700px] bg-white" id="reports">
-            <div class="max-w-6xl mx-auto">
-                <h2 class="text-2xl font-bold text-gray-800 mb-8">Reports & Analytics</h2>
-                
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Filter Reports</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                            <label for="report-type" class="block mb-2 font-medium text-gray-700">Report Type</label>
-                            <select id="report-type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="policies">Policy Overview</option>
-                                <option value="claims">Claims Summary</option>
-                                <option value="premiums">Premium Collections</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="date-range" class="block mb-2 font-medium text-gray-700">Date Range</label>
-                            <input type="text" id="date-range" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Select date range">
-                        </div>
-                        <div>
-                            <label for="branch" class="block mb-2 font-medium text-gray-700">Branch</label>
-                            <select id="branch" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="">All Branches</option>
-                                <option value="lusaka">Lusaka</option>
-                                <option value="kitwe">Kitwe</option>
-                                <option value="ndola">Ndola</option>
-                            </select>
-                        </div>
-                        <div class="flex items-end">
-                            <button class="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Generate Report</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                    <canvas id="policy-chart" class="w-full h-64"></canvas>
-                </div>
-                
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metric</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Total Premiums</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">K 2,400,000</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">May 2025</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Stable</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">New Policies</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">45</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">May 2025</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Growing</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Claims Processed</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">18</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">May 2025</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </main>
     </div>
 
-    <script>
-        // Tab Switching Functionality
-        function showScreen(screenId) {
-            // Hide all screens and remove active class
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('block');
-                screen.classList.add('hidden');
-            });
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('bg-white', 'text-blue-600', 'border-b-4', 'border-blue-600');
-                tab.classList.add('bg-gray-50', 'text-gray-600');
-                tab.setAttribute('aria-selected', 'false');
-            });
-
-            // Show selected screen and add active class
-            const selectedScreen = document.getElementById(screenId);
-            selectedScreen.classList.remove('hidden');
-            selectedScreen.classList.add('block');
-            
-            const selectedTab = document.querySelector(`.tab[data-screen="${screenId}"]`);
-            selectedTab.classList.remove('bg-gray-50', 'text-gray-600');
-            selectedTab.classList.add('bg-white', 'text-blue-600', 'border-b-4', 'border-blue-600');
-            selectedTab.setAttribute('aria-selected', 'true');
-        }
-
-        // Attach event listeners to tabs
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                showScreen(tab.getAttribute('data-screen'));
-            });
-        });
-
-        // Login Form Validation
-        document.getElementById('login-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            let isValid = true;
-
-            const username = document.getElementById('username');
-            const password = document.getElementById('password');
-            const usernameError = document.getElementById('username-error');
-            const passwordError = document.getElementById('password-error');
-
-            // Reset errors
-            username.classList.remove('border-red-500');
-            password.classList.remove('border-red-500');
-            usernameError.classList.add('hidden');
-            passwordError.classList.add('hidden');
-
-            // Validate username
-            if (!username.value.trim()) {
-                username.classList.add('border-red-500');
-                usernameError.classList.remove('hidden');
-                isValid = false;
-            }
-
-            // Validate password
-            if (!password.value.trim()) {
-                password.classList.add('border-red-500');
-                passwordError.classList.remove('hidden');
-                isValid = false;
-            }
-
-            if (isValid) {
-                alert('Login successful! (This is a prototype.)');
-            }
-        });
-
-        // Initialize Chart.js for Reports Screen
-        try {
-            const ctx = document.getElementById('policy-chart');
-            if (ctx && typeof Chart !== 'undefined') {
-                new Chart(ctx.getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-                        datasets: [{
-                            label: 'New Policies',
-                            data: [30, 45, 60, 50, 45],
-                            backgroundColor: 'rgba(59, 130, 246, 0.6)',
-                            borderColor: 'rgba(59, 130, 246, 1)',
-                            borderWidth: 1
-                        }, {
-                            label: 'Claims Processed',
-                            data: [20, 30, 25, 35, 18],
-                            backgroundColor: 'rgba(239, 68, 68, 0.6)',
-                            borderColor: 'rgba(239, 68, 68, 1)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Count'
-                                }
-                            },
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Month'
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                position: 'top'
-                            },
-                            title: {
-                                display: true,
-                                text: 'Policy and Claims Overview (2025)'
-                            }
-                        }
-                    }
-                });
-            } else {
-                console.warn('Chart.js not loaded or canvas element not found');
-            }
-        } catch (error) {
-            console.error('Error initializing chart:', error);
-        }
-    </script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/dashboard.js"></script>
 </body>
 </html>

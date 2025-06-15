@@ -6,38 +6,42 @@ require_once __DIR__ . '/../helpers/functions.php';
 class ClientController {
     private $db;
 
-    public function __construct() {
-        $this->db = getDBConnection();
+    public function __construct($db) {
+        $this->db = $db;
     }
 
-    public function index() {
-        AuthMiddleware::requireAnyRole(['admin', 'agent']);
-        
+    public function getAll() {
         try {
             $stmt = $this->db->query("
-                SELECT id, first_name, last_name, email, phone, status, created_at 
-                FROM clients 
-                ORDER BY created_at DESC
+                SELECT 
+                    c.*,
+                    COUNT(DISTINCT p.id) as total_policies,
+                    COUNT(DISTINCT cl.id) as total_claims
+                FROM clients c
+                LEFT JOIN policies p ON c.id = p.client_id
+                LEFT JOIN claims cl ON p.id = cl.policy_id
+                GROUP BY c.id
+                ORDER BY c.created_at DESC
             ");
             $clients = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            sendJsonResponse(['clients' => $clients]);
-        } catch (PDOException $e) {
-            error_log("Error fetching clients: " . $e->getMessage());
-            sendJsonResponse(['error' => 'Failed to fetch clients'], 500);
+
+            echo json_encode($clients);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['message' => 'An error occurred while fetching clients']);
         }
     }
 
-    public function show($id) {
-        AuthMiddleware::requireAnyRole(['admin', 'agent']);
-        
+    public function getById($id) {
         try {
             $stmt = $this->db->prepare("
-                SELECT c.*, 
-                       COUNT(p.id) as total_policies,
-                       SUM(p.premium_amount) as total_premium
+                SELECT 
+                    c.*,
+                    COUNT(DISTINCT p.id) as total_policies,
+                    COUNT(DISTINCT cl.id) as total_claims
                 FROM clients c
                 LEFT JOIN policies p ON c.id = p.client_id
+                LEFT JOIN claims cl ON p.id = cl.policy_id
                 WHERE c.id = ?
                 GROUP BY c.id
             ");
@@ -45,164 +49,145 @@ class ClientController {
             $client = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$client) {
-                sendJsonResponse(['error' => 'Client not found'], 404);
+                http_response_code(404);
+                echo json_encode(['message' => 'Client not found']);
+                return;
             }
 
-            sendJsonResponse(['client' => $client]);
-        } catch (PDOException $e) {
-            error_log("Error fetching client: " . $e->getMessage());
-            sendJsonResponse(['error' => 'Failed to fetch client details'], 500);
+            // Get client's policies
+            $stmt = $this->db->prepare("
+                SELECT * FROM policies 
+                WHERE client_id = ? 
+                ORDER BY created_at DESC
+            ");
+            $stmt->execute([$id]);
+            $client['policies'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            echo json_encode($client);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['message' => 'An error occurred while fetching client details']);
         }
     }
 
-    public function store() {
-        AuthMiddleware::requireAnyRole(['admin', 'agent']);
-        AuthMiddleware::validateCSRF();
-
-        $data = json_decode(file_get_contents('php://input'), true);
-        
-        // Validate required fields
-        $required_fields = ['first_name', 'last_name', 'email', 'phone'];
-        foreach ($required_fields as $field) {
-            if (empty($data[$field])) {
-                sendJsonResponse(['error' => "Field {$field} is required"], 400);
-            }
-        }
-
-        // Validate email
-        if (!isValidEmail($data['email'])) {
-            sendJsonResponse(['error' => 'Invalid email format'], 400);
-        }
-
+    public function create() {
         try {
+            $data = json_decode(file_get_contents('php://input'), true);
+            
+            if (!isset($data['name']) || !isset($data['email']) || !isset($data['phone']) || !isset($data['address'])) {
+                http_response_code(400);
+                echo json_encode(['message' => 'Name, email, phone, and address are required']);
+                return;
+            }
+
             // Check if email already exists
             $stmt = $this->db->prepare("SELECT id FROM clients WHERE email = ?");
             $stmt->execute([$data['email']]);
             if ($stmt->fetch()) {
-                sendJsonResponse(['error' => 'Email already registered'], 400);
+                http_response_code(400);
+                echo json_encode(['message' => 'Email already exists']);
+                return;
             }
 
             // Insert new client
             $stmt = $this->db->prepare("
-                INSERT INTO clients (
-                    first_name, last_name, email, phone, address, 
-                    date_of_birth, status, created_by, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, NOW())
+                INSERT INTO clients (name, email, phone, address)
+                VALUES (?, ?, ?, ?)
             ");
-
             $stmt->execute([
-                $data['first_name'],
-                $data['last_name'],
+                $data['name'],
                 $data['email'],
                 $data['phone'],
-                $data['address'] ?? null,
-                $data['date_of_birth'] ?? null,
-                $_SESSION['user_id']
+                $data['address']
             ]);
 
             $clientId = $this->db->lastInsertId();
             
-            // Log activity
-            logActivity($_SESSION['user_id'], 'create_client', "Created new client: {$data['email']}");
+            // Get created client
+            $stmt = $this->db->prepare("SELECT * FROM clients WHERE id = ?");
+            $stmt->execute([$clientId]);
+            $client = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            sendJsonResponse([
-                'message' => 'Client created successfully',
-                'client_id' => $clientId
-            ], 201);
-
-        } catch (PDOException $e) {
-            error_log("Error creating client: " . $e->getMessage());
-            sendJsonResponse(['error' => 'Failed to create client'], 500);
+            echo json_encode($client);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['message' => 'An error occurred while creating client']);
         }
     }
 
     public function update($id) {
-        AuthMiddleware::requireAnyRole(['admin', 'agent']);
-        AuthMiddleware::validateCSRF();
+        try {
+            $data = json_decode(file_get_contents('php://input'), true);
+            
+            if (!isset($data['name']) || !isset($data['email']) || !isset($data['phone']) || !isset($data['address'])) {
+                http_response_code(400);
+                echo json_encode(['message' => 'Name, email, phone, and address are required']);
+                return;
+            }
 
-        $data = json_decode(file_get_contents('php://input'), true);
-        
+            // Check if client exists
+            $stmt = $this->db->prepare("SELECT id FROM clients WHERE id = ?");
+            $stmt->execute([$id]);
+            if (!$stmt->fetch()) {
+                http_response_code(404);
+                echo json_encode(['message' => 'Client not found']);
+                return;
+            }
+
+            // Check if email is already used by another client
+            $stmt = $this->db->prepare("SELECT id FROM clients WHERE email = ? AND id != ?");
+            $stmt->execute([$data['email'], $id]);
+            if ($stmt->fetch()) {
+                http_response_code(400);
+                echo json_encode(['message' => 'Email already exists']);
+                return;
+            }
+
+            // Update client
+            $stmt = $this->db->prepare("
+                UPDATE clients 
+                SET name = ?, email = ?, phone = ?, address = ?
+                WHERE id = ?
+            ");
+            $stmt->execute([
+                $data['name'],
+                $data['email'],
+                $data['phone'],
+                $data['address'],
+                $id
+            ]);
+
+            // Get updated client
+            $stmt = $this->db->prepare("SELECT * FROM clients WHERE id = ?");
+            $stmt->execute([$id]);
+            $client = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            echo json_encode($client);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['message' => 'An error occurred while updating client']);
+        }
+    }
+
+    public function delete($id) {
         try {
             // Check if client exists
             $stmt = $this->db->prepare("SELECT id FROM clients WHERE id = ?");
             $stmt->execute([$id]);
             if (!$stmt->fetch()) {
-                sendJsonResponse(['error' => 'Client not found'], 404);
+                http_response_code(404);
+                echo json_encode(['message' => 'Client not found']);
+                return;
             }
 
-            // Build update query dynamically based on provided fields
-            $updates = [];
-            $params = [];
-            
-            $allowed_fields = ['first_name', 'last_name', 'phone', 'address', 'date_of_birth', 'status'];
-            foreach ($allowed_fields as $field) {
-                if (isset($data[$field])) {
-                    $updates[] = "{$field} = ?";
-                    $params[] = $data[$field];
-                }
-            }
-
-            if (empty($updates)) {
-                sendJsonResponse(['error' => 'No valid fields to update'], 400);
-            }
-
-            $params[] = $_SESSION['user_id']; // updated_by
-            $params[] = $id; // WHERE id = ?
-
-            $sql = "UPDATE clients SET " . implode(', ', $updates) . ", 
-                    updated_by = ?, updated_at = NOW() 
-                    WHERE id = ?";
-            
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute($params);
-
-            // Log activity
-            logActivity($_SESSION['user_id'], 'update_client', "Updated client ID: {$id}");
-
-            sendJsonResponse(['message' => 'Client updated successfully']);
-
-        } catch (PDOException $e) {
-            error_log("Error updating client: " . $e->getMessage());
-            sendJsonResponse(['error' => 'Failed to update client'], 500);
-        }
-    }
-
-    public function delete($id) {
-        AuthMiddleware::requireRole('admin');
-        AuthMiddleware::validateCSRF();
-
-        try {
-            // Check if client has active policies
-            $stmt = $this->db->prepare("
-                SELECT COUNT(*) as policy_count 
-                FROM policies 
-                WHERE client_id = ? AND status = 'active'
-            ");
+            // Delete client (cascade will handle related records)
+            $stmt = $this->db->prepare("DELETE FROM clients WHERE id = ?");
             $stmt->execute([$id]);
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($result['policy_count'] > 0) {
-                sendJsonResponse(['error' => 'Cannot delete client with active policies'], 400);
-            }
-
-            // Soft delete the client
-            $stmt = $this->db->prepare("
-                UPDATE clients 
-                SET status = 'deleted', 
-                    deleted_by = ?, 
-                    deleted_at = NOW() 
-                WHERE id = ?
-            ");
-            $stmt->execute([$_SESSION['user_id'], $id]);
-
-            // Log activity
-            logActivity($_SESSION['user_id'], 'delete_client', "Deleted client ID: {$id}");
-
-            sendJsonResponse(['message' => 'Client deleted successfully']);
-
-        } catch (PDOException $e) {
-            error_log("Error deleting client: " . $e->getMessage());
-            sendJsonResponse(['error' => 'Failed to delete client'], 500);
+            echo json_encode(['message' => 'Client deleted successfully']);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['message' => 'An error occurred while deleting client']);
         }
     }
 
