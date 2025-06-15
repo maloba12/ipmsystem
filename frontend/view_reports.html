@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZamSure Insurance - Reports</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .prototype-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: white;
+            color: #3498db;
+            border-bottom: 3px solid #3498db;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .screen {
+            display: none;
+            padding: 30px;
+            min-height: 700px;
+            background: white;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Reports Styles */
+        .reports-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .filters {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .select-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            margin-right: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .filter-actions {
+            text-align: right;
+            margin-top: 15px;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .report-table th, .report-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .report-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .report-table tbody tr:hover {
+            background: #f8f9ff;
+            cursor: pointer;
+        }
+
+        .report-table tbody tr td {
+            color: #495057;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* Dashboard Styles */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f8f9fa;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .action-btn {
+            background: white;
+            border: 2px solid #e9ecef;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #2c3e50;
+            display: block;
+        }
+
+        .action-btn:hover {
+            border-color: #3498db;
+            background: #f8f9ff;
+            transform: translateY(-2px);
+        }
+
+        .action-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+
+        .notification {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification strong {
+            font-weight: 600;
+        }
+
+        .notification a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .notification a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            .tab {
+                flex: 1 1 50%;
+            }
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+            .reports-container {
+                margin: 0 10px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+            .report-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="prototype-container">
+        <div class="header">
+            <h1>ZamSure Insurance</h1>
+            <p>Insurance Policy Management System</p>
+        </div>
+
+        <div class="nav-tabs" role="tablist">
+            <button class="tab" data-screen="home" aria-selected="false">Home</button>
+            <button class="tab" data-screen="login" aria-selected="false">Login Page</button>
+            <button class="tab" data-screen="dashboard" aria-selected="false">Dashboard</button>
+            <button class="tab" data-screen="client-form" aria-selected="false">Client Registration</button>
+            <button class="tab" data-screen="agent-form" aria-selected="false">Agent Registration</button>
+            <button class="tab" data-screen="policy-form" aria-selected="false">Policy Management</button>
+            <button class="tab" data-screen="claims" aria-selected="false">Claims Tracking</button>
+            <button class="tab active" data-screen="reports" aria-selected="true">Reports</button>
+        </div>
+
+        <!-- Reports Screen -->
+        <div class="screen active" id="reports">
+            <div class="reports-container">
+                <h2 style="margin-bottom: 30px; color: #2c3e50;">Reports & Analytics</h2>
+                
+                <div class="filters">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">Filter Reports</h3>
+                    <div class="filter-row">
+                        <div class="form-group">
+                            <label for="report-type">Report Type</label>
+                            <select class="select-control" id="report-type" aria-label="Select report type">
+                                <option value="expiring-policies">Expiring Policies</option>
+                                <option value="claim-status">Claim Status Summary</option>
+                                <option value="premium-collection">Premium Collection</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="start-date">Start Date</label>
+                            <input type="date" class="form-control" id="start-date" aria-label="Select start date">
+                        </div>
+                        <div class="form-group">
+                            <label for="end-date">End Date</label>
+                            <input type="date" class="form-control" id="end-date" aria-label="Select end date">
+                        </div>
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn btn-primary" onclick="generateReport()">Generate Report</button>
+                        <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+                    </div>
+                </div>
+
+                <div id="report-content">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">Expiring Policies Report</h3>
+                    <table class="report-table" role="grid" aria-label="Expiring Policies Report">
+                        <thead>
+                            <tr>
+                                <th>Policy Number</th>
+                                <th>Client Name</th>
+                                <th>Policy Type</th>
+                                <th>Expiration Date</th>
+                                <th>Premium (K)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-table-body">
+                            <tr onclick="viewPolicy('POL-2025-001')">
+                                <td>POL-2025-001</td>
+                                <td>John Mulenga</td>
+                                <td>Life Insurance</td>
+                                <td>2025-07-01</td>
+                                <td>500</td>
+                            </tr>
+                            <tr onclick="viewPolicy('POL-2025-002')">
+                                <td>POL-2025-002</td>
+                                <td>Mary Chanda</td>
+                                <td>Auto Insurance</td>
+                                <td>2025-07-15</td>
+                                <td>300</td>
+                            </tr>
+                            <tr onclick="viewPolicy('POL-2025-003')">
+                                <td>POL-2025-003</td>
+                                <td>Peter Banda</td>
+                                <td>Home Insurance</td>
+                                <td>2025-07-20</td>
+                                <td>400</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="text-align: right;">
+                        <button class="btn btn-primary" onclick="alert('Exporting report as CSV... (Mock functionality)')">Export as CSV</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div class="screen" id="dashboard">
+            <div class="dashboard-header">
+                <div>
+                    <h2>Dashboard</h2>
+                    <p style="color: #6c757d;">Welcome back, <span id="user-role">Administrator</span></p>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar" aria-label="User avatar">AD</div>
+                    <div>
+                        <div style="font-weight: 600;">Admin User</div>
+                        <div style="color: #6c757d; font-size: 14px;">Last login: Today 01:13 PM</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card" role="region" aria-label="Total Policies">
+                    <div class="stat-number">1,247</div>
+                    <div>Total Policies</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #ff6b6b, #ee5a24);" role="region" aria-label="Pending Claims">
+                    <div class="stat-number">23</div>
+                    <div>Pending Claims</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #4ecdc4, #44a08d);" role="region" aria-label="Monthly Premium">
+                    <div class="stat-number">K 2.4M</div>
+                    <div>Monthly Premium</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #a8edea, #fed6e3);" role="region" aria-label="Active Clients">
+                    <div class="stat-number" style="color: #2c3e50;">856</div>
+                    <div style="color: #2c3e50;">Active Clients</div>
+                </div>
+            </div>
+
+            <h3 style="margin-bottom: 20px; color: #2c3e50;">Quick Actions</h3>
+            <div class="quick-actions">
+                <a href="#" class="action-btn" onclick="showScreen('client-form')" role="button" aria-label="Register new client">
+                    <div class="action-icon">👤</div>
+                    <div><strong>Register Client</strong></div>
+                    <div style="color: #6c757d; font-size: 12px;">Add new customer</div>
+                </a>
+                <a href="#" class="action-btn" onclick="showScreen('agent-form')" role="button" aria-label="Register new agent">
+                    <div class="action-icon">🧑‍💼</div>
+                    <div><strong>Register Agent</strong></div>
+                    <div style="color: #6c757d; font-size: 12px;">Add new agent</div>
+                </a>
+                <a href="#" class="action-btn" onclick="showScreen('policy-form')" role="button" aria-label="Create new policy">
+                    <div class="action-icon">📋</div>
+                    <div><strong>Create Policy</strong></div>
+                    <div style="color: #6c757d; font-size: 12px;">New insurance policy</div>
+                </a>
+                <a href="#" class="action-btn" onclick="showScreen('claims')" role="button" aria-label="Process insurance claim">
+                    <div class="action-icon">🔍</div>
+                    <div><strong>Process Claim</strong></div>
+                    <div style="color: #6c757d; font-size: 12px;">Handle insurance claims</div>
+                </a>
+                <a href="#" class="action-btn" onclick="alert('Payment processing coming soon!')" role="button" aria-label="Record premium payment">
+                    <div class="action-icon">💰</div>
+                    <div><strong>Record Payment</strong></div>
+                    <div style="color: #6c757d; font-size: 12px;">Premium payments</div>
+                </a>
+                <a href="#" class="action-btn" onclick="showScreen('reports')" role="button" aria-label="View analytics reports">
+                    <div class="action-icon">📊</div>
+                    <div><strong>View Reports</strong></div>
+                    <div style="color: #6c757d; font-size: 12px;">Analytics & insights</div>
+                </a>
+            </div>
+
+            <div class="notification" role="alert">
+                <strong>Notice:</strong> 12 policies are expiring within the next 30 days. <a href="#" onclick="showScreen('reports')">Review expiration report</a> for details.
+            </div>
+        </div>
+
+        <!-- Placeholder for Other Screens -->
+        <div class="screen" id="home">
+            <div style="text-align: center; padding: 50px;">
+                <h2>Home</h2>
+                <p>Placeholder for Home screen.</p>
+            </div>
+        </div>
+        <div class="screen" id="login">
+            <div style="text-align: center; padding: 50px;">
+                <h2>Login Page</h2>
+                <p>Placeholder for Login screen.</p>
+            </div>
+        </div>
+        <div class="screen" id="client-form">
+            <div style="text-align: center; padding: 50px;">
+                <h2>Client Registration</h2>
+                <p>Placeholder for Client Registration screen.</p>
+            </div>
+        </div>
+        <div class="screen" id="agent-form">
+            <div style="text-align: center; padding: 50px;">
+                <h2>Agent Registration</h2>
+                <p>Placeholder for Agent Registration screen.</p>
+            </div>
+        </div>
+        <div class="screen" id="policy-form">
+            <div style="text-align: center; padding: 50px;">
+                <h2>Policy Management</h2>
+                <p>Placeholder for Policy Management screen.</p>
+            </div>
+        </div>
+        <div class="screen" id="claims">
+            <div style="text-align: center; padding: 50px;">
+                <h2>Claims Tracking</h2>
+                <p>Placeholder for Claims Tracking screen.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Switching Functionality
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                tab.setAttribute('aria-selected', 'false');
+            });
+            document.getElementById(screenId).classList.add('active');
+            document.querySelector(`.tab[data-screen="${screenId}"]`).classList.add('active');
+            document.querySelector(`.tab[data-screen="${screenId}"]`).setAttribute('aria-selected', 'true');
+        }
+
+        // Attach event listeners to tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                showScreen(tab.getAttribute('data-screen'));
+            });
+        });
+
+        // Mock Report Data
+        const mockReports = {
+            'expiring-policies': [
+                { policyNumber: 'POL-2025-001', clientName: 'John Mulenga', policyType: 'Life Insurance', expirationDate: '2025-07-01', premium: 500 },
+                { policyNumber: 'POL-2025-002', clientName: 'Mary Chanda', policyType: 'Auto Insurance', expirationDate: '2025-07-15', premium: 300 },
+                { policyNumber: 'POL-2025-003', clientName: 'Peter Banda', policyType: 'Home Insurance', expirationDate: '2025-07-20', premium: 400 }
+            ],
+            'claim-status': [
+                { claimNumber: 'CLM-2025-001', claimant: 'Alice Mwansa', status: 'Pending', amount: 10000, date: '2025-06-01' },
+                { claimNumber: 'CLM-2025-002', claimant: 'David Phiri', status: 'Approved', amount: 5000, date: '2025-06-05' }
+            ],
+            'premium-collection': [
+                { policyNumber: 'POL-2025-001', clientName: 'John Mulenga', amount: 500, date: '2025-06-01' },
+                { policyNumber: 'POL-2025-004', clientName: 'Grace Zulu', amount: 600, date: '2025-06-10' }
+            ]
+        };
+
+        // Generate Report Function
+        function generateReport() {
+            const reportType = document.getElementById('report-type').value;
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const reportContent = document.getElementById('report-content');
+            const tableBody = document.getElementById('report-table-body');
+
+            // Validate dates
+            if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+                alert('Start date must be before end date.');
+                return;
+            }
+
+            // Update report title
+            let reportTitle = '';
+            if (reportType === 'expiring-policies') reportTitle = 'Expiring Policies Report';
+            else if (reportType === 'claim-status') reportTitle = 'Claim Status Summary';
+            else if (reportType === 'premium-collection') reportTitle = 'Premium Collection Report';
+            reportContent.querySelector('h3').textContent = reportTitle;
+
+            // Update table headers and data
+            tableBody.innerHTML = '';
+            let headers = [];
+            if (reportType === 'expiring-policies') {
+                headers = ['Policy Number', 'Client Name', 'Policy Type', 'Expiration Date', 'Premium (K)'];
+                reportContent.querySelector('table').setAttribute('aria-label', 'Expiring Policies Report');
+            } else if (reportType === 'claim-status') {
+                headers = ['Claim Number', 'Claimant', 'Status', 'Amount (K)', 'Date'];
+                reportContent.querySelector('table').setAttribute('aria-label', 'Claim Status Summary');
+            } else if (reportType === 'premium-collection') {
+                headers = ['Policy Number', 'Client Name', 'Amount (K)', 'Date'];
+                reportContent.querySelector('table').setAttribute('aria-label', 'Premium Collection Report');
+            }
+
+            // Update table headers
+            const thead = reportContent.querySelector('thead tr');
+            thead.innerHTML = headers.map(header => `<th>${header}</th>`).join('');
+
+            // Filter and display data
+            const data = mockReports[reportType];
+            const filteredData = data.filter(item => {
+                const itemDate = new Date(item.date || item.expirationDate);
+                if (!startDate && !endDate) return true;
+                if (startDate && !endDate) return itemDate >= new Date(startDate);
+                if (!startDate && endDate) return itemDate <= new Date(endDate);
+                return itemDate >= new Date(startDate) && itemDate <= new Date(endDate);
+            });
+
+            if (filteredData.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="' + headers.length + '" class="no-data">No data available for the selected filters.</td></tr>';
+                return;
+            }
+
+            filteredData.forEach(item => {
+                const row = document.createElement('tr');
+                row.setAttribute('onclick', `view${reportType === 'expiring-policies' ? 'Policy' : reportType === 'claim-status' ? 'Claim' : 'Premium'}('${item.policyNumber || item.claimNumber}')`);
+                if (reportType === 'expiring-policies') {
+                    row.innerHTML = `
+                        <td>${item.policyNumber}</td>
+                        <td>${item.clientName}</td>
+                        <td>${item.policyType}</td>
+                        <td>${item.expirationDate}</td>
+                        <td>${item.premium}</td>
+                    `;
+                } else if (reportType === 'claim-status') {
+                    row.innerHTML = `
+                        <td>${item.claimNumber}</td>
+                        <td>${item.claimant}</td>
+                        <td>${item.status}</td>
+                        <td>${item.amount}</td>
+                        <td>${item.date}</td>
+                    `;
+                } else if (reportType === 'premium-collection') {
+                    row.innerHTML = `
+                        <td>${item.policyNumber}</td>
+                        <td>${item.clientName}</td>
+                        <td>${item.amount}</td>
+                        <td>${item.date}</td>
+                    `;
+                }
+                tableBody.appendChild(row);
+            });
+        }
+
+        // View Policy/Claim/Premium Function (Mock)
+        function viewPolicy(policyNumber) {
+            alert(`Viewing policy ${policyNumber} (Mock functionality)`);
+        }
+
+        function viewClaim(claimNumber) {
+            alert(`Viewing claim ${claimNumber} (Mock functionality)`);
+        }
+
+        function viewPremium(policyNumber) {
+            alert(`Viewing premium for policy ${policyNumber} (Mock functionality)`);
+        }
+
+        // Reset Filters Function
+        function resetFilters() {
+            document.getElementById('report-type').value = 'expiring-policies';
+            document.getElementById('start-date').value = '';
+            document.getElementById('end-date').value = '';
+            generateReport();
+        }
+
+        // Mock dynamic user role for Dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            const role = localStorage.getItem('userRole') || 'Administrator';
+            document.getElementById('user-role').textContent = role;
+            generateReport(); // Initialize with default report
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZamSure Insurance - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .prototype-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: white;
+            color: #3498db;
+            border-bottom: 3px solid #3498db;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .screen {
+            display: none;
+            padding: 30px;
+            min-height: 700px;
+            background: white;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Login Screen Styles */
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .form-control.invalid {
+            border-color: #dc3545;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .forgot-password a {
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .forgot-password a:hover {
+            color: #3498db;
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            .tab {
+                flex: 1 1 50%;
+            }
+            .login-container {
+                margin: 20px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="prototype-container">
+        <div class="header">
+            <h1>ZamSure Insurance</h1>
+            <p>Insurance Policy Management System</p>
+        </div>
+
+        <div class="nav-tabs" role="tablist">
+            <button class="tab" data-screen="home" aria-selected="false">Home</button>
+            <button class="tab active" data-screen="login" aria-selected="true">Login Page</button>
+            <button class="tab" data-screen="dashboard" aria-selected="false">Dashboard</button>
+            <button class="tab" data-screen="client-form" aria-selected="false">Client Registration</button>
+            <button class="tab" data-screen="policy-form" aria-selected="false">Policy Management</button>
+            <button class="tab" data-screen="claims" aria-selected="false">Claims Tracking</button>
+            <button class="tab" data-screen="reports" aria-selected="false">Reports</button>
+        </div>
+
+        <!-- Login Screen -->
+        <div class="screen active" id="login">
+            <div class="login-container">
+                <div class="login-header">
+                    <div class="logo">ZS</div>
+                    <h2>ZamSure Insurance</h2>
+                    <p style="color: #6c757d; margin-top: 10px;">Sign in to access the Policy Management System</p>
+                </div>
+                
+                <form id="login-form" novalidate>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" class="form-control" id="username" placeholder="Enter your username" required aria-describedby="username-error">
+                        <div id="username-error" class="error-message">Username is required</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" placeholder="Enter your password" required aria-describedby="password-error">
+                        <div id="password-error" class="error-message">Password is required</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Login As</label>
+                        <select class="form-control" id="role" required aria-describedby="role-error">
+                            <option value="">Select Role</option>
+                            <option value="admin">Administrator</option>
+                            <option value="agent">Insurance Agent</option>
+                            <option value="claims">Claims Officer</option>
+                        </select>
+                        <div id="role-error" class="error-message">Please select a role</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Sign In</button>
+                </form>
+                
+                <div class="forgot-password">
+                    <a href="#">Forgot password? Contact your administrator</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Placeholder for Other Screens -->
+        <div class="screen" id="home">
+            <div style="text-align: center; padding: 50px;">
+                <h2>Home</h2>
+                <p>Placeholder for Home screen.</p>
+            </div>
+        </div>
+        <div class="screen" id="dashboard">
+            <div style="text-align: center; padding: 50px;">
+                <h2>Dashboard</h2>
+                <p>Placeholder for Dashboard screen.</p>
+            </div>
+        </div>
+        <div class="screen" id="client-form">
+            <div style="text-align: center; padding: 50px;">
+                <h2>Client Registration</h2>
+                <p>Placeholder for Client Registration screen.</p>
+            </div>
+        </div>
+        <div class="screen" id="policy-form">
+            <div style="text-align: center; padding: 50px;">
+                <h2>Policy Management</h2>
+                <p>Placeholder for Policy Management screen.</p>
+            </div>
+        </div>
+        <div class="screen" id="claims">
+            <div style="text-align: center; padding: 50px;">
+                <h2>Claims Tracking</h2>
+                <p>Placeholder for Claims Tracking screen.</p>
+            </div>
+        </div>
+        <div class="screen" id="reports">
+            <div style="text-align: center; padding: 50px;">
+                <h2>Reports</h2>
+                <p>Placeholder for Reports screen.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Switching Functionality
+        function showScreen(screenId) {
+            // Hide all screens and remove active class
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                tab.setAttribute('aria-selected', 'false');
+            });
+
+            // Show selected screen and add active class
+            document.getElementById(screenId).classList.add('active');
+            document.querySelector(`.tab[data-screen="${screenId}"]`).classList.add('active');
+            document.querySelector(`.tab[data-screen="${screenId}"]`).setAttribute('aria-selected', 'true');
+        }
+
+        // Attach event listeners to tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                showScreen(tab.getAttribute('data-screen'));
+            });
+        });
+
+        // Login Form Validation
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            let isValid = true;
+
+            const username = document.getElementById('username');
+            const password = document.getElementById('password');
+            const role = document.getElementById('role');
+            const usernameError = document.getElementById('username-error');
+            const passwordError = document.getElementById('password-error');
+            const roleError = document.getElementById('role-error');
+
+            // Reset errors
+            username.classList.remove('invalid');
+            password.classList.remove('invalid');
+            role.classList.remove('invalid');
+            usernameError.style.display = 'none';
+            passwordError.style.display = 'none';
+            roleError.style.display = 'none';
+
+            // Validate username
+            if (!username.value.trim()) {
+                username.classList.add('invalid');
+                usernameError.style.display = 'block';
+                isValid = false;
+            }
+
+            // Validate password
+            if (!password.value.trim()) {
+                password.classList.add('invalid');
+                passwordError.style.display = 'block';
+                isValid = false;
+            }
+
+            // Validate role
+            if (!role.value) {
+                role.classList.add('invalid');
+                roleError.style.display = 'block';
+                isValid = false;
+            }
+
+            if (isValid) {
+                // Mock login success
+                alert(`Login successful as ${role.value}! Redirecting to Dashboard... (This is a prototype.)`);
+                showScreen('dashboard');
+            }
+        });
+    </script>
+</body>
+</html>
