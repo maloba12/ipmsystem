@@ -3,180 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZamSure Insurance - IPMS</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>ZamSure Insurance - Secure Your Future</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   <link rel="stylesheet" href="css/home.css">
+   <script src="js/home.js"></script>
+   <script src="js/register.js"></script>
+
 </head>
 <body>
-    <div class="app-container">
-        <!-- Left Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                    <div class="logo">ZS</div>
-                <h1>ZamSure IPMS</h1>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="logo">
+                <span>ZamSure</span>
             </div>
-
-            <nav class="sidebar-nav">
-                <ul>
-                    <li>
-                        <a href="#" class="nav-link active" data-page="dashboard">
-                            <i class="fas fa-home"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="nav-link" data-page="clients">
-                            <i class="fas fa-users"></i>
-                            <span>Clients</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="nav-link" data-page="policies">
-                            <i class="fas fa-file-contract"></i>
-                            <span>Policies</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="nav-link" data-page="claims">
-                            <i class="fas fa-clipboard-list"></i>
-                            <span>Claims</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="nav-link" data-page="reports">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>Reports</span>
-                        </a>
-                    </li>
-                    <li class="admin-only" style="display: none;">
-                        <a href="#" class="nav-link" data-page="agents">
-                            <i class="fas fa-user-tie"></i>
-                            <span>Agents</span>
-                        </a>
-                    </li>
-                    <li class="admin-only" style="display: none;">
-                        <a href="#" class="nav-link" data-page="settings">
-                            <i class="fas fa-cog"></i>
-                            <span>Settings</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Top Header -->
-            <header class="top-header">
-                <div class="header-left">
-                    <button id="sidebar-toggle" class="sidebar-toggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h2 id="page-title">Dashboard</h2>
-                </div>
-                <div class="header-right">
-                    <div class="user-menu">
-                        <div class="user-info">
-                            <span id="user-name">Loading...</span>
-                            <span id="user-role" class="user-role">Loading...</span>
-                        </div>
-                        <div class="user-avatar" id="user-avatar">AD</div>
-                        <div class="dropdown-menu">
-                            <a href="#" data-page="profile"><i class="fas fa-user"></i> Profile</a>
-                            <a href="#" data-page="settings"><i class="fas fa-cog"></i> Settings</a>
-                            <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Content Area -->
-            <div class="content-area">
-                <!-- Login Screen (Initial View) -->
-                <div id="login-screen" class="screen active">
-                    <div class="login-container">
-                        <div class="login-header">
-                            <div class="logo">ZS</div>
-                            <h2>ZamSure Insurance</h2>
-                            <p>Insurance Policy Management System</p>
-                        </div>
-                        
-                        <form id="login-form" novalidate>
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
-                                <div class="error-message" id="email-error"></div>
-                        </div>
-                            <div class="form-group">
-                                <label for="password">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" required>
-                                <div class="error-message" id="password-error"></div>
-                    </div>
-                            <button type="submit" class="btn btn-primary">Sign In</button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Dashboard Screen -->
-                <div id="dashboard-screen" class="screen">
-                    <div class="dashboard-stats">
-                        <div class="stat-card">
-                            <div class="stat-icon"><i class="fas fa-file-contract"></i></div>
-                            <div class="stat-info">
-                                <h3>Total Policies</h3>
-                                <p id="total-policies">Loading...</p>
+            
+            <!-- Desktop Navigation -->
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#about">About</a>
+                <a href="#services">Services</a>
+                <a href="login.html">Login</a>
+                <a href="register.php" class="btn btn-primary" style="margin-left: 0.5rem;">Sign Up</a>
+            </div>
+            
+            <!-- Mobile Menu Toggle -->
+            <button class="mobile-menu-toggle" aria-label="Toggle mobile menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <!-- Mobile Navigation -->
+            <div class="nav-links mobile-menu">
+                <a href="#home">Home</a>
+                <a href="#about">About</a>
+                <a href="#services">Services</a>
+                <a href="/login">Login</a>
+                <a href="/register" class="btn btn-primary">Sign Up</a>
+            </div>
         </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon"><i class="fas fa-clipboard-list"></i></div>
-                            <div class="stat-info">
-                                <h3>Pending Claims</h3>
-                                <p id="pending-claims">Loading...</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
-                            <div class="stat-info">
-                                <h3>Monthly Premium</h3>
-                                <p id="monthly-premium">Loading...</p>
-                    </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon"><i class="fas fa-users"></i></div>
-                            <div class="stat-info">
-                                <h3>Active Clients</h3>
-                                <p id="active-clients">Loading...</p>
-                        </div>
-                        </div>
-                    </div>
+    </nav>
 
-                    <div class="dashboard-charts">
-                        <div class="chart-container">
-                            <h3>Policy Distribution</h3>
-                            <canvas id="policy-chart"></canvas>
-                        </div>
-                        <div class="chart-container">
-                            <h3>Claims Overview</h3>
-                            <canvas id="claims-chart"></canvas>
-                        </div>
-                    </div>
+    <!-- Hero Section -->
+    <section class="hero-section" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Secure Your Future with ZamSure Insurance</h1>
+                <p>Comprehensive insurance solutions tailored to protect what matters most to you and your loved ones.</p>
+                <div class="cta-buttons">
+                    <a href="/get-started" class="btn btn-primary">Get Started</a>
+                    <a href="#about" class="btn btn-secondary">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                    <div class="recent-activities">
-                        <h3>Recent Activities</h3>
-                        <div class="activity-list" id="activity-list">
-                            <!-- Activities will be loaded dynamically -->
-                        </div>
+    <!-- Features Section -->
+    <section class="features-section" id="services">
+        <div class="container">
+            <div class="features-header">
+                <h2>Insurance Solutions</h2>
+                <h3>Why Choose ZamSure Insurance?</h3>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-shield-halved"></i>
+                    <h4>Comprehensive Coverage</h4>
+                    <p>Wide range of insurance products to protect your assets and loved ones with tailored solutions for every need.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-clock"></i>
+                    <h4>Quick Claims Process</h4>
+                    <p>Efficient and hassle-free claims processing when you need it most, with 24/7 support and rapid response times.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-star"></i>
+                    <h4>Premium Service</h4>
+                    <p>Dedicated support team to assist you every step of the way, ensuring exceptional customer experience.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <h2>About ZamSure Insurance</h2>
+            <p>With years of experience in the insurance industry, ZamSure Insurance provides reliable and comprehensive insurance solutions to protect what matters most to you. We are committed to offering exceptional service and peace of mind to our clients across Zambia.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#services">Products</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="/claims">Claims</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p>📍 123 Insurance Avenue, Lusaka, Zambia</p>
+                    <p>📞 +260 123 456 789</p>
+                    <p>✉️ info@zamsure.com</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Follow Us</h3>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
-
-                <!-- Other screens will be loaded dynamically -->
             </div>
-        </main>
-    </div>
-
-    <script src="js/auth.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/dashboard.js"></script>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ZamSure Insurance. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

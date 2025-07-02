@@ -10,12 +10,37 @@ class Auth {
         // Check if user is already logged in
         if (this.token) {
             this.validateToken();
-        } else {
-            this.showLoginScreen();
         }
 
         // Initialize event listeners
         this.initEventListeners();
+
+        // Initialize UI state
+        this.initializeUI();
+    }
+
+    initializeUI() {
+        // Initialize page state
+        const loginScreen = document.getElementById('login-screen');
+        const dashboardScreen = document.getElementById('dashboard-screen');
+        const publicHeader = document.getElementById('public-header');
+        const dashboardHeader = document.getElementById('dashboard-header');
+        const sidebar = document.querySelector('.sidebar');
+
+        // Set initial visibility
+        if (this.user) {
+            loginScreen.classList.remove('active');
+            dashboardScreen.classList.add('active');
+            publicHeader.style.display = 'none';
+            dashboardHeader.style.display = 'block';
+            sidebar.style.display = 'block';
+        } else {
+            loginScreen.classList.add('active');
+            dashboardScreen.classList.remove('active');
+            publicHeader.style.display = 'block';
+            dashboardHeader.style.display = 'none';
+            sidebar.style.display = 'none';
+        }
     }
 
     initEventListeners() {
@@ -43,50 +68,52 @@ class Auth {
             if (response.ok) {
                 const data = await response.json();
                 this.setUser(data.user);
-                this.showDashboard();
+                this.initializeUI();
+                this.updateUI();
             } else {
                 this.logout();
             }
         } catch (error) {
-            console.error('Token validation error:', error);
             this.logout();
         }
     }
 
     async handleLogin(e) {
         e.preventDefault();
-        
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        
+        const formData = new FormData(e.target);
+        const username = formData.get('username');
+        const password = formData.get('password');
+        const role = formData.get('role');
+
         try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ username, password, role })
             });
 
-            const data = await response.json();
-
             if (response.ok) {
+                const data = await response.json();
                 this.token = data.token;
                 localStorage.setItem('token', this.token);
-                this.setUser(data.user);
-                this.showDashboard();
+                this.validateToken();
             } else {
-                this.showError(data.message || 'Login failed');
+                const error = await response.json();
+                this.showError(error.message || 'Invalid credentials');
             }
         } catch (error) {
-            console.error('Login error:', error);
             this.showError('An error occurred during login');
         }
     }
 
     handleLogout(e) {
         e.preventDefault();
-        this.logout();
+        localStorage.removeItem('token');
+        this.token = null;
+        this.user = null;
+        window.location.href = '/frontend/login.html';
     }
 
     logout() {
@@ -98,7 +125,7 @@ class Auth {
 
     setUser(user) {
         this.user = user;
-        this.updateUI();
+        document.getElementById('user-role').textContent = user.role;
     }
 
     updateUI() {
@@ -121,18 +148,92 @@ class Auth {
     }
 
     showLoginScreen() {
-        document.querySelectorAll('.screen').forEach(screen => {
-            screen.classList.remove('active');
-        });
         document.getElementById('login-screen').classList.add('active');
+        document.getElementById('dashboard-screen').classList.remove('active');
+        document.querySelector('.sidebar').style.display = 'none';
+        document.querySelector('.top-header').style.display = 'none';
+        // Hide all other navigation elements
+        document.querySelectorAll('.screen').forEach(screen => {
+            if (screen.id !== 'login-screen') {
+                screen.classList.remove('active');
+            }
+        });
     }
 
-    showDashboard() {
-        document.querySelectorAll('.screen').forEach(screen => {
-            screen.classList.remove('active');
-        });
-        document.getElementById('dashboard-screen').classList.add('active');
-        document.getElementById('page-title').textContent = 'Dashboard';
+    updateUI() {
+        // Show/hide elements based on user role
+        const isAdmin = this.user?.role === 'admin';
+        
+        // Show all elements for admin
+        if (isAdmin) {
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.style.display = 'block';
+            });
+            
+            // Show admin-specific navigation items
+            document.querySelectorAll('.sidebar-nav li').forEach(li => {
+                li.style.display = 'block';
+            });
+        } else {
+            // For non-admin users, hide admin-only elements
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            // For non-admin users, hide admin-specific navigation items
+            document.querySelectorAll('.sidebar-nav li').forEach(li => {
+                li.style.display = li.classList.contains('admin-only') ? 'none' : 'block';
+            });
+        }
+
+        // Update the main content area based on user role
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) {
+            if (isAdmin) {
+                mainContent.innerHTML = `<!-- Admin Dashboard Content -->
+                    <div class="dashboard-content">
+                        <h2>Welcome, ${this.user?.name}</h2>
+                        <p>Role: ${this.user?.role}</p>
+                        <div class="admin-dashboard-stats">
+                            <div class="stat-card">
+                                <h3>Total Users</h3>
+                                <p id="total-users">Loading...</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Total Policies</h3>
+                                <p id="total-policies">Loading...</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Total Claims</h3>
+                                <p id="total-claims">Loading...</p>
+                            </div>
+                        </div>
+                    </div>`;
+            } else {
+                mainContent.innerHTML = `<!-- Regular User Dashboard Content -->
+                    <div class="dashboard-content">
+                        <h2>Welcome, ${this.user?.name}</h2>
+                        <p>Role: ${this.user?.role}</p>
+                        <div class="user-dashboard-stats">
+                            <div class="stat-card">
+                                <h3>Your Policies</h3>
+                                <p id="user-policies">Loading...</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Your Claims</h3>
+                                <p id="user-claims">Loading...</p>
+                            </div>
+                        </div>
+                    </div>`;
+            }
+        }
+
+        // Update header elements
+        const pageHeader = document.getElementById('page-title');
+        if (pageHeader) {
+            pageHeader.textContent = 'Dashboard';
+        }
+    }
     }
 
     showError(message) {

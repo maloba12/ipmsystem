@@ -1,11 +1,11 @@
 <?php
-// Redirect to frontend
-header("Location: frontend/");
+// Redirect to frontend using absolute path
+header("Location: /ipmsystem/frontend/");
 exit;
 session_start();
 
 // Database configuration
-require_once 'config/database.php';
+require_once __DIR__ . '/config/database.php';
 
 // Autoload classes
 spl_autoload_register(function($class) {

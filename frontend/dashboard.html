@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZamSure Insurance - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -32,6 +34,9 @@
             color: white;
             padding: 30px;
             text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .header h1 {
@@ -42,6 +47,20 @@
         .header p {
             opacity: 0.9;
             font-size: 1.1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-right: 30px;
+        }
+
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
         }
 
         .nav-tabs {
@@ -84,35 +103,7 @@
             display: block;
         }
 
-        /* Dashboard Styles */
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #f8f9fa;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .user-avatar {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #3498db, #2c3e50);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
+        /* Dashboard Stats */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -121,100 +112,74 @@
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .action-btn {
             background: white;
-            border: 2px solid #e9ecef;
             padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            color: #2c3e50;
-            display: block;
-        }
-
-        .action-btn:hover {
-            border-color: #3498db;
-            background: #f8f9ff;
-            transform: translateY(-2px);
-        }
-
-        .action-icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            color: #3498db;
-        }
-
-        .notification {
-            background: #d1ecf1;
-            border: 1px solid #bee5eb;
-            color: #0c5460;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 20px;
         }
 
-        .notification strong {
-            font-weight: 600;
-        }
-
-        .notification a {
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
             color: #3498db;
-            text-decoration: none;
         }
 
-        .notification a:hover {
-            text-decoration: underline;
+        .stat-info h3 {
+            margin: 0;
+            font-size: 24px;
+            color: #2c3e50;
+        }
+
+        .stat-info p {
+            margin: 5px 0 0;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        /* Charts */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .chart-title {
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #2c3e50;
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .user-info {
+                margin-top: 20px;
+                padding: 0;
+            }
             .nav-tabs {
                 flex-wrap: wrap;
             }
             .tab {
                 flex: 1 1 50%;
-            }
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            .quick-actions {
-                grid-template-columns: 1fr;
-            }
-            .dashboard-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 20px;
             }
         }
     </style>
@@ -222,13 +187,17 @@
 <body>
     <div class="prototype-container">
         <div class="header">
-            <h1>ZamSure Insurance</h1>
-            <p>Insurance Policy Management System</p>
+            <div>
+                <h1>ZamSure Insurance</h1>
+                <p>Insurance Policy Management System</p>
+            </div>
+            <div class="user-info">
+                <span id="user-role">Administrator</span>
+                <button id="logout-btn" class="btn btn-primary">Logout</button>
+            </div>
         </div>
 
         <div class="nav-tabs" role="tablist">
-            <button class="tab" data-screen="home" aria-selected="false">Home</button>
-            <button class="tab" data-screen="login" aria-selected="false">Login Page</button>
             <button class="tab active" data-screen="dashboard" aria-selected="true">Dashboard</button>
             <button class="tab" data-screen="client-form" aria-selected="false">Client Registration</button>
             <button class="tab" data-screen="policy-form" aria-selected="false">Policy Management</button>
@@ -238,15 +207,6 @@
 
         <!-- Dashboard Screen -->
         <div class="screen active" id="dashboard">
-            <div class="dashboard-header">
-                <div>
-                    <h2>Dashboard</h2>
-                    <p style="color: #6c757d;">Welcome back, <span id="user-role">Administrator</span></p>
-                </div>
-                <div class="user-info">
-                    <div class="user-avatar" aria-label="User avatar">AD</div>
-                    <div>
-                        <div style="font-weight: 600;">Admin User</div>
                         <div style="color: #6c757d; font-size: 14px;">Last login: Today 12:28 PM</div>
                     </div>
                 </div>

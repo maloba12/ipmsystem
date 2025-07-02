@@ -3,7 +3,7 @@
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', '');
-define('DB_NAME', 'ipmsystem');
+define('DB_NAME', 'zamsure_db');
 
 // Application configuration
 define('APP_NAME', 'IPM System');

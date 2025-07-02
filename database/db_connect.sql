@@ -34,13 +34,21 @@ USE `phpmyadmin`;
 -- Table structure for table `pma__bookmark`
 --
 
+DROP TABLE IF EXISTS `pma__bookmark`;
+
 CREATE TABLE `pma__bookmark` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `dbase` varchar(255) NOT NULL DEFAULT '',
-  `user` varchar(255) NOT NULL DEFAULT '',
-  `label` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
-  `query` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Bookmarks';
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `dbase` VARCHAR(255) NOT NULL DEFAULT '',
+  `user` VARCHAR(255) NOT NULL DEFAULT '',
+  `label` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
+  `query` TEXT NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB 
+DEFAULT CHARSET=utf8mb4 
+COLLATE=utf8mb4_bin 
+COMMENT='Bookmarks';
+
+
 
 -- --------------------------------------------------------
 
@@ -48,16 +56,22 @@ CREATE TABLE `pma__bookmark` (
 -- Table structure for table `pma__central_columns`
 --
 
+DROP TABLE IF EXISTS `pma__central_columns`;
+
 CREATE TABLE `pma__central_columns` (
-  `db_name` varchar(64) NOT NULL,
-  `col_name` varchar(64) NOT NULL,
-  `col_type` varchar(64) NOT NULL,
-  `col_length` text DEFAULT NULL,
-  `col_collation` varchar(64) NOT NULL,
-  `col_isNull` tinyint(1) NOT NULL,
-  `col_extra` varchar(255) DEFAULT '',
-  `col_default` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Central list of columns';
+  `db_name` VARCHAR(64) NOT NULL,
+  `col_name` VARCHAR(64) NOT NULL,
+  `col_type` VARCHAR(64) NOT NULL,
+  `col_length` TEXT DEFAULT NULL,
+  `col_collation` VARCHAR(64) NOT NULL,
+  `col_isNull` TINYINT(1) NOT NULL,
+  `col_extra` VARCHAR(255) DEFAULT '',
+  `col_default` TEXT DEFAULT NULL
+) ENGINE=InnoDB 
+DEFAULT CHARSET=utf8 
+COLLATE=utf8_bin 
+COMMENT='Central list of columns';
+
 
 -- --------------------------------------------------------
 
@@ -484,14 +498,16 @@ USE `zamsure_db`;
 --
 
 CREATE TABLE `agents` (
-  `agentID` int(11) NOT NULL,
-  `firstName` varchar(100) NOT NULL,
-  `lastName` varchar(100) NOT NULL,
-  `phone` varchar(20) DEFAULT NULL,
-  `email` varchar(100) NOT NULL,
-  `hireDate` date DEFAULT curdate(),
-  `commissionRate` decimal(5,2) DEFAULT 0.00 CHECK (`commissionRate` >= 0 and `commissionRate` <= 100)
+  `agentID` INT(11) NOT NULL AUTO_INCREMENT,
+  `firstName` VARCHAR(100) NOT NULL,
+  `lastName` VARCHAR(100) NOT NULL,
+  `phone` VARCHAR(20) DEFAULT NULL,
+  `email` VARCHAR(100) NOT NULL,
+  `hireDate` DATE DEFAULT CURDATE(),
+  `commissionRate` DECIMAL(5,2) DEFAULT 0.00 CHECK (`commissionRate` >= 0 AND `commissionRate` <= 100),
+  PRIMARY KEY (`agentID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 -- --------------------------------------------------------
 

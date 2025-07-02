@@ -20,9 +20,21 @@ function generateToken($length = 32) {
 
 /**
  * Check if user is logged in
+ * @return bool
  */
 function isLoggedIn() {
-    return isset($_SESSION['user_id']);
+    if (!isset($_SESSION['user_id'])) {
+        error_log("isLoggedIn: user_id not set");
+        return false;
+    }
+    
+    if (!isset($_SESSION['user_role'])) {
+        error_log("isLoggedIn: user_role not set");
+        return false;
+    }
+    
+    error_log("isLoggedIn: User ID: " . $_SESSION['user_id'] . ", Role: " . $_SESSION['user_role']);
+    return true;
 }
 
 /**

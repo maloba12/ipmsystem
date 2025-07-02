@@ -4,117 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZamSure Insurance - Login</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
             min-height: 100vh;
-        }
-
-        .prototype-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #2c3e50, #3498db);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
-
-        .nav-tabs {
             display: flex;
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
+            justify-content: center;
+            align-items: center;
         }
 
-        .tab {
-            flex: 1;
-            padding: 15px 20px;
-            text-align: center;
-            background: #f8f9fa;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            color: #495057;
-            transition: all 0.3s ease;
-        }
-
-        .tab.active {
-            background: white;
-            color: #3498db;
-            border-bottom: 3px solid #3498db;
-        }
-
-        .tab:hover {
-            background: #e9ecef;
-        }
-
-        .screen {
-            display: none;
-            padding: 30px;
-            min-height: 700px;
-            background: white;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        /* Login Screen Styles */
         .login-container {
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 40px;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 350px;
         }
 
         .login-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
-        .logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #3498db, #2c3e50);
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
+        .login-header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
             font-size: 2rem;
-            font-weight: bold;
+        }
+
+        .login-header p {
+            color: #6c757d;
+            font-size: 1rem;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: white;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .form-group input:invalid {
+            border-color: var(--danger-color);
         }
 
         .form-group label {
@@ -122,13 +70,14 @@
             margin-bottom: 8px;
             font-weight: 600;
             color: #2c3e50;
+            font-size: 0.95rem;
         }
 
         .form-control {
             width: 100%;
-            padding: 12px 15px;
+            padding: 10px 12px;
             border: 2px solid #e9ecef;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 14px;
             transition: border-color 0.3s ease;
         }
@@ -150,9 +99,9 @@
         }
 
         .btn {
-            padding: 12px 24px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -170,155 +119,73 @@
             box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
         }
 
-        .forgot-password {
+        /* Error display */
+        .error-display {
             text-align: center;
-            margin-top: 20px;
+            color: #dc3545;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 6px;
+            background-color: #fee2e2;
+            display: none;
         }
 
-        .forgot-password a {
-            color: #6c757d;
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-
-        .forgot-password a:hover {
-            color: #3498db;
-            text-decoration: underline;
+        .error-display.visible {
+            display: block;
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .nav-tabs {
-                flex-wrap: wrap;
-            }
-            .tab {
-                flex: 1 1 50%;
-            }
             .login-container {
                 margin: 20px;
-                padding: 20px;
+                padding: 25px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="prototype-container">
-        <div class="header">
+    <div class="login-container">
+        <div class="login-header">
             <h1>ZamSure Insurance</h1>
             <p>Insurance Policy Management System</p>
         </div>
-
-        <div class="nav-tabs" role="tablist">
-            <button class="tab" data-screen="home" aria-selected="false">Home</button>
-            <button class="tab active" data-screen="login" aria-selected="true">Login Page</button>
-            <button class="tab" data-screen="dashboard" aria-selected="false">Dashboard</button>
-            <button class="tab" data-screen="client-form" aria-selected="false">Client Registration</button>
-            <button class="tab" data-screen="policy-form" aria-selected="false">Policy Management</button>
-            <button class="tab" data-screen="claims" aria-selected="false">Claims Tracking</button>
-            <button class="tab" data-screen="reports" aria-selected="false">Reports</button>
+        
+        <!-- Error display -->
+        <div id="error-display" class="error-display">
+            <?php
+            if (isset($_SESSION['error'])) {
+                echo htmlspecialchars($_SESSION['error']);
+                unset($_SESSION['error']);
+            }
+            ?>
         </div>
 
-        <!-- Login Screen -->
-        <div class="screen active" id="login">
-            <div class="login-container">
-                <div class="login-header">
-                    <div class="logo">ZS</div>
-                    <h2>ZamSure Insurance</h2>
-                    <p style="color: #6c757d; margin-top: 10px;">Sign in to access the Policy Management System</p>
-                </div>
-                
-                <form id="login-form" novalidate>
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" class="form-control" id="username" placeholder="Enter your username" required aria-describedby="username-error">
-                        <div id="username-error" class="error-message">Username is required</div>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" class="form-control" id="password" placeholder="Enter your password" required aria-describedby="password-error">
-                        <div id="password-error" class="error-message">Password is required</div>
-                    </div>
-                    <div class="form-group">
-                        <label for="role">Login As</label>
-                        <select class="form-control" id="role" required aria-describedby="role-error">
-                            <option value="">Select Role</option>
-                            <option value="admin">Administrator</option>
-                            <option value="agent">Insurance Agent</option>
-                            <option value="claims">Claims Officer</option>
-                        </select>
-                        <div id="role-error" class="error-message">Please select a role</div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Sign In</button>
-                </form>
-                
-                <div class="forgot-password">
-                    <a href="#">Forgot password? Contact your administrator</a>
-                </div>
+        <form id="login-form" action="login.php" method="POST" novalidate>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="username" placeholder="Enter your email" required aria-describedby="email-error">
+                <div id="email-error" class="error-message">Email is required</div>
             </div>
-        </div>
-
-        <!-- Placeholder for Other Screens -->
-        <div class="screen" id="home">
-            <div style="text-align: center; padding: 50px;">
-                <h2>Home</h2>
-                <p>Placeholder for Home screen.</p>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required aria-describedby="password-error">
+                <div id="password-error" class="error-message">Password is required</div>
             </div>
-        </div>
-        <div class="screen" id="dashboard">
-            <div style="text-align: center; padding: 50px;">
-                <h2>Dashboard</h2>
-                <p>Placeholder for Dashboard screen.</p>
-            </div>
-        </div>
-        <div class="screen" id="client-form">
-            <div style="text-align: center; padding: 50px;">
-                <h2>Client Registration</h2>
-                <p>Placeholder for Client Registration screen.</p>
-            </div>
-        </div>
-        <div class="screen" id="policy-form">
-            <div style="text-align: center; padding: 50px;">
-                <h2>Policy Management</h2>
-                <p>Placeholder for Policy Management screen.</p>
-            </div>
-        </div>
-        <div class="screen" id="claims">
-            <div style="text-align: center; padding: 50px;">
-                <h2>Claims Tracking</h2>
-                <p>Placeholder for Claims Tracking screen.</p>
-            </div>
-        </div>
-        <div class="screen" id="reports">
-            <div style="text-align: center; padding: 50px;">
-                <h2>Reports</h2>
-                <p>Placeholder for Reports screen.</p>
-            </div>
-        </div>
+            <button type="submit" class="btn btn-primary" style="cursor: pointer; z-index: 10; position: relative;">
+                Sign In
+                <!-- Debug overlay check -->
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,0,0,0.1); z-index: -1;"></div>
+            </button>
+        </form>
     </div>
 
     <script>
-        // Tab Switching Functionality
-        function showScreen(screenId) {
-            // Hide all screens and remove active class
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-                tab.setAttribute('aria-selected', 'false');
-            });
-
-            // Show selected screen and add active class
-            document.getElementById(screenId).classList.add('active');
-            document.querySelector(`.tab[data-screen="${screenId}"]`).classList.add('active');
-            document.querySelector(`.tab[data-screen="${screenId}"]`).setAttribute('aria-selected', 'true');
-        }
-
-        // Attach event listeners to tabs
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                showScreen(tab.getAttribute('data-screen'));
-            });
+        // Show error message if it exists
+        document.addEventListener('DOMContentLoaded', function() {
+            const errorDisplay = document.getElementById('error-display');
+            if (errorDisplay.textContent.trim()) {
+                errorDisplay.classList.add('visible');
+            }
         });
 
         // Login Form Validation
@@ -326,25 +193,21 @@
             e.preventDefault();
             let isValid = true;
 
-            const username = document.getElementById('username');
+            const email = document.getElementById('email');
             const password = document.getElementById('password');
-            const role = document.getElementById('role');
-            const usernameError = document.getElementById('username-error');
+            const emailError = document.getElementById('email-error');
             const passwordError = document.getElementById('password-error');
-            const roleError = document.getElementById('role-error');
 
             // Reset errors
-            username.classList.remove('invalid');
+            email.classList.remove('invalid');
             password.classList.remove('invalid');
-            role.classList.remove('invalid');
-            usernameError.style.display = 'none';
+            emailError.style.display = 'none';
             passwordError.style.display = 'none';
-            roleError.style.display = 'none';
 
-            // Validate username
-            if (!username.value.trim()) {
-                username.classList.add('invalid');
-                usernameError.style.display = 'block';
+            // Validate email
+            if (!email.value.trim()) {
+                email.classList.add('invalid');
+                emailError.style.display = 'block';
                 isValid = false;
             }
 
@@ -355,18 +218,18 @@
                 isValid = false;
             }
 
-            // Validate role
-            if (!role.value) {
-                role.classList.add('invalid');
-                roleError.style.display = 'block';
-                isValid = false;
-            }
-
+            // Submit form if valid
             if (isValid) {
-                // Mock login success
-                alert(`Login successful as ${role.value}! Redirecting to Dashboard... (This is a prototype.)`);
-                showScreen('dashboard');
+                // Remove preventDefault() effect
+                e.target.submit();
             }
+        });
+
+        // Add click handler for button to ensure it works
+        document.querySelector('.btn-primary').addEventListener('click', (e) => {
+            console.log('Button clicked');
+            // Trigger form submission
+            document.getElementById('login-form').submit();
         });
     </script>
 </body>
