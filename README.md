@@ -11,6 +11,8 @@ A comprehensive system for managing insurance policies, claims, and client infor
 - Client management
 - Report generation
 - Activity logging
+- Payment recording with validation and security
+- API documentation available in `/docs/api_documentation.md`
 
 ## Requirements
 
@@ -92,11 +94,24 @@ ipmsystem/
 - GET `/api/dashboard/stats` - Get dashboard statistics
 - GET `/api/dashboard/activities` - Get recent activities
 
+### Payments
+- POST `/api/payments` - Record payment
+  - Requires: policy_number, amount, payment_date, payment_method
+  - Returns: transaction_number
+
+### Policies
+- POST `/api/policies` - Create policy
+- GET `/api/policies/{id}` - Get policy details
+- PUT `/api/policies/{id}` - Update policy
+- DELETE `/api/policies/{id}` - Cancel policy
+
 ## Security
 
 - All API endpoints (except login and register) require authentication
 - Passwords are hashed using PHP's password_hash()
 - JWT tokens are used for authentication
+- CSRF protection for form submissions
+- Input validation and sanitization
 - CORS is enabled for API access
 - SQL injection prevention using prepared statements
 

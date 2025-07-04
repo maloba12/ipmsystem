@@ -21,6 +21,13 @@ Thumbs.db
 *.log
 logs/
 error_log
+# Tests
+tests/
+# API documentation
+docs/api/
+# Build files
+/build/
+/dist/
 
 # Cache
 *.cache

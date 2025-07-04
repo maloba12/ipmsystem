@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Payment - IPMS</title>
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/tailwind.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+            <h1 class="text-2xl font-bold mb-6 text-center">Record Payment</h1>
+            
+            <form id="paymentForm" class="space-y-4">
+                <div>
+                    <label for="policyNumber" class="block text-sm font-medium text-gray-700">Policy Number</label>
+                    <input type="text" id="policyNumber" name="policyNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                </div>
+
+                <div>
+                    <label for="amount" class="block text-sm font-medium text-gray-700">Amount</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">$</span>
+                        </div>
+                        <input type="number" id="amount" name="amount" step="0.01" min="0" class="pl-7 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="paymentDate" class="block text-sm font-medium text-gray-700">Payment Date</label>
+                    <input type="date" id="paymentDate" name="paymentDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                </div>
+
+                <div>
+                    <label for="paymentMethod" class="block text-sm font-medium text-gray-700">Payment Method</label>
+                    <select id="paymentMethod" name="paymentMethod" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                        <option value="">Select payment method</option>
+                        <option value="cash">Cash</option>
+                        <option value="check">Check</option>
+                        <option value="credit_card">Credit Card</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="notes" class="block text-sm font-medium text-gray-700">Notes</label>
+                    <textarea id="notes" name="notes" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="window.location.href='policies.php'" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Record Payment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // CSRF Token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        
+        // Form validation
+        function validateForm() {
+            const errors = [];
+            const amount = parseFloat(document.getElementById('amount').value);
+            const paymentDate = document.getElementById('paymentDate').value;
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            
+            // Policy number validation
+            if (!document.getElementById('policyNumber').value.trim()) {
+                errors.push('Policy number is required');
+            }
+            
+            // Amount validation
+            if (isNaN(amount) || amount <= 0) {
+                errors.push('Please enter a valid amount greater than 0');
+            }
+            
+            // Date validation
+            if (!paymentDate) {
+                errors.push('Payment date is required');
+            } else if (new Date(paymentDate) > new Date()) {
+                errors.push('Payment date cannot be in the future');
+            }
+            
+            // Payment method validation
+            if (!paymentMethod) {
+                errors.push('Please select a payment method');
+            }
+            
+            if (errors.length > 0) {
+                const errorDiv = document.getElementById('errorMessages');
+                errorDiv.innerHTML = errors.map(error => `<div class="text-red-500 mb-2">${error}</div>`).join('');
+                return false;
+            }
+            return true;
+        }
+
+        // Initialize form
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add CSRF token to form
+            const form = document.getElementById('paymentForm');
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrf_token';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+
+            // Handle form submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!validateForm()) return;
+                
+                // Show loading state
+                const submitButton = form.querySelector('button[type="submit"]');
+                const originalText = submitButton.textContent;
+                submitButton.disabled = true;
+                submitButton.textContent = 'Processing...';
+
+                // Submit form
+                const formData = new FormData(form);
+                
+                fetch('backend/api/record_payment.php', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-Token': csrfToken
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Clear form and show success message
+                        form.reset();
+                        document.getElementById('errorMessages').innerHTML = 
+                            '<div class="text-green-500 mb-2">Payment recorded successfully!</div>';
+                        setTimeout(() => {
+                            window.location.href = 'policies.php';
+                        }, 2000);
+                    } else {
+                        // Show error messages
+                        document.getElementById('errorMessages').innerHTML = 
+                            `<div class="text-red-500 mb-2">${data.message}</div>`;
+                        submitButton.textContent = originalText;
+                        submitButton.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('errorMessages').innerHTML = 
+                        '<div class="text-red-500 mb-2">An error occurred while recording the payment</div>';
+                    submitButton.textContent = originalText;
+                    submitButton.disabled = false;
+                });
+            });
+
+            // Add input validation
+            form.querySelectorAll('input, select').forEach(input => {
+                input.addEventListener('input', () => {
+                    document.getElementById('errorMessages').innerHTML = '';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -234,7 +234,6 @@ class Auth {
             pageHeader.textContent = 'Dashboard';
         }
     }
-    }
 
     showError(message) {
         const errorElement = document.getElementById('email-error');

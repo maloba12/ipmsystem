@@ -87,14 +87,72 @@ class AuthMiddleware {
 
     // Role-based authorization methods
     public static function requireRole($requiredRole) {
-        if (!isset($_SESSION['user_role'])) {
+        // Check both $_SESSION['user_role'] and $_SESSION['user']['role'] for compatibility
+        $userRole = strtolower($_SESSION['user_role'] ?? $_SESSION['user']['role'] ?? '');
+        
+        if (empty($userRole)) {
             header("Location: /ipmsystem/frontend/login.php?error=Unauthorized+access");
             exit();
         }
-        if (strtolower($_SESSION['user_role']) !== strtolower($requiredRole)) {
+        
+        // Map role names to a consistent format
+        $roleMap = [
+            'admin' => 'admin',
+            'insurance agent' => 'agent',
+            'agent' => 'agent',
+            'insurance_agent' => 'agent'
+        ];
+        
+        $normalizedRole = $roleMap[$userRole] ?? $userRole;
+        $normalizedRequiredRole = $roleMap[strtolower($requiredRole)] ?? strtolower($requiredRole);
+        
+        if ($normalizedRole !== $normalizedRequiredRole) {
             header("Location: /ipmsystem/frontend/unauthorized.php");
             exit();
         }
+    }
+
+    public static function hasPermission($feature) {
+        // Define feature permissions based on roles
+        $permissions = [
+            'admin' => [
+                'all' => true
+            ],
+            'agent' => [
+                'clients' => true,
+                'policies' => true,
+                'performance' => true,
+                'settings' => false
+            ],
+            'nurse' => [
+                'patients' => true,
+                'appointments' => true,
+                'vitals' => true,
+                'reports' => true
+            ],
+            'doctor' => [
+                'patients' => true,
+                'appointments' => true,
+                'prescriptions' => true,
+                'diagnoses' => true,
+                'reports' => true
+            ]
+        ];
+
+        // Get user role
+        $userRole = strtolower($_SESSION['user_role'] ?? $_SESSION['user']['role'] ?? '');
+        $normalizedRole = $permissions[$userRole] ?? null;
+
+        if (!$normalizedRole) {
+            return false;
+        }
+
+        // Check if feature is allowed for this role
+        if ($normalizedRole['all'] ?? false) {
+            return true;
+        }
+
+        return $normalizedRole[$feature] ?? false;
     }
 
     public static function requireAnyRole($roles) {

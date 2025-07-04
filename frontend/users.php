@@ -23,16 +23,10 @@ if ($_SESSION['user_role'] !== 'Admin') {
     <title>Users Management - IPMS</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://kit.fontawesome.com/your-code.js"></script>
+    <script src="js/users.js"></script>
 </head>
 <body class="bg-gray-50">
     <?php include __DIR__ . '/includes/navigation.php'; ?>
-    <div class="container mx-auto p-6">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Users Management - IPMS</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-50">
     <div class="container mx-auto p-6">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold">Users Management</h1>

@@ -203,6 +203,49 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'Admin') {
             </div>
         </div>
 
+        <!-- Insurance Types Management -->
+        <div class="p-4 border-b">
+            <h1 class="text-xl font-bold mb-4">Admin Dashboard</h1>
+            <div class="space-y-4">
+                <a href="insurance_types.php" class="admin-action">
+                    <div class="admin-icon bg-blue-100 text-blue-600">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">Insurance Types</h3>
+                        <p class="text-sm text-gray-600">Manage insurance types and services</p>
+                    </div>
+                </a>
+                <a href="users.php" class="admin-action">
+                    <div class="admin-icon bg-blue-100 text-blue-600">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">User Management</h3>
+                        <p class="text-sm text-gray-600">Manage users and roles</p>
+                    </div>
+                </a>
+                <a href="settings.php" class="admin-action">
+                    <div class="admin-icon bg-green-100 text-green-600">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">System Settings</h3>
+                        <p class="text-sm text-gray-600">Configure system settings</p>
+                    </div>
+                </a>
+                <a href="reports.php" class="admin-action">
+                    <div class="admin-icon bg-purple-100 text-purple-600">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">Reports</h3>
+                        <p class="text-sm text-gray-600">View system reports</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
         <!-- System Status -->
         <div class="mb-6">
             <h3 class="text-lg font-semibold mb-4">System Status</h3>
@@ -387,5 +430,124 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'Admin') {
         </div>
     </div>
 
-    </body>
+        <!-- Insurance Types Management Page -->
+    <main class="ml-64 p-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="bg-white shadow rounded-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold">Insurance Types Management</h2>
+                    <button onclick="openAddTypeModal()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Add New Type
+                    </button>
+                </div>
+
+                <!-- Insurance Types List -->
+                <div id="insuranceTypesList" class="space-y-4">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Modal -->
+        <div id="typeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+            <div class="bg-white rounded-lg p-6 w-96">
+                <h3 class="text-lg font-bold mb-4">Add Insurance Type</h3>
+                <form id="typeForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Name</label>
+                        <input type="text" name="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Description</label>
+                        <textarea name="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" onclick="closeModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function loadInsuranceTypes() {
+            try {
+                const response = await fetch('../backend/api/insurance_types.php?action=list');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const container = document.getElementById('insuranceTypesList');
+                    container.innerHTML = data.data.map(type => `
+                        <div class="border rounded-lg p-4">
+                            <h3 class="font-semibold">${type.type_name}</h3>
+                            <p class="text-gray-600">${type.type_description}</p>
+                            <p class="mt-2">Services: ${type.services || 'No services added'}</p>
+                            <div class="mt-4 flex space-x-2">
+                                <button onclick="editType(${type.type_id})" class="px-3 py-1 text-blue-600 hover:text-blue-800">Edit</button>
+                                <button onclick="deleteType(${type.type_id})" class="px-3 py-1 text-red-600 hover:text-red-800">Delete</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading insurance types:', error);
+            }
+        }
+
+        function openAddTypeModal() {
+            document.getElementById('typeModal').classList.remove('hidden');
+            document.getElementById('typeForm').reset();
+        }
+
+        function closeModal() {
+            document.getElementById('typeModal').classList.add('hidden');
+        }
+
+        async function editType(id) {
+            // Implementation for editing a type
+            console.log('Edit type:', id);
+        }
+
+        async function deleteType(id) {
+            if (confirm('Are you sure you want to delete this insurance type?')) {
+                try {
+                    const response = await fetch('../backend/api/insurance_types.php?action=delete', {
+                        method: 'POST',
+                        body: JSON.stringify({ id })
+                    });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        loadInsuranceTypes();
+                    }
+                } catch (error) {
+                    console.error('Error deleting type:', error);
+                }
+            }
+        }
+
+        document.getElementById('typeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const formData = new FormData(e.target);
+                const response = await fetch('../backend/api/insurance_types.php?action=add', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    closeModal();
+                    loadInsuranceTypes();
+                }
+            } catch (error) {
+                console.error('Error adding type:', error);
+            }
+        });
+
+        // Load types when page loads
+        loadInsuranceTypes();
+    </script>
+</body>
 </html>

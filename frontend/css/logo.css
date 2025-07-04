@@ -1,0 +1,148 @@
+/* Logo Styles */
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.icon {
+    width: 50px;
+    height: 50px;
+    background: var(--primary-color);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Navigation logo */
+.nav-logo .icon {
+    width: 60px;
+    height: 60px;
+}
+
+/* Hero section logo */
+.hero-logo .icon {
+    width: 70px;
+    height: 70px;
+}
+
+.icon::before {
+    content: '';
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    background: white;
+    border-radius: 50%;
+    top: 6px;
+    left: 7px;
+}
+
+.icon::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 2px;
+    background: white;
+    border-radius: 2px;
+    top: 22px;
+    left: 15px;
+    box-shadow: 0 4px 0 white, 0 8px 0 white;
+}
+
+.logo-text {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-color);
+    letter-spacing: -0.5px;
+}
+
+/* Navigation logo text */
+.nav-logo .logo-text {
+    font-size: 32px;
+}
+
+/* Hero section logo text */
+.hero-logo .logo-text {
+    font-size: 36px;
+}
+
+.logo-subtext {
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin-top: 2px;
+    font-weight: 400;
+}
+
+/* Dark Theme Version */
+.dark-theme .logo-container {
+    background: #1f2937;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.dark-theme .logo-text {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.dark-theme .icon {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.dark-theme .logo-subtext {
+    color: #9ca3af;
+}
+
+/* Minimal Version */
+.minimal .icon {
+    background: transparent;
+    border: 2px solid #667eea;
+}
+
+.minimal .icon::before,
+.minimal .icon::after {
+    background: #667eea;
+}
+
+/* Compact Version */
+.compact {
+    flex-direction: column;
+    gap: 5px;
+}
+
+.compact .icon {
+    width: 30px;
+    height: 30px;
+}
+
+.compact .icon::before {
+    width: 10px;
+    height: 10px;
+    top: 4px;
+    left: 5px;
+}
+
+.compact .icon::after {
+    width: 12px;
+    height: 1.5px;
+    top: 14px;
+    left: 10px;
+    box-shadow: 0 3px 0 white, 0 6px 0 white;
+}
+
+.compact .logo-text {
+    font-size: 18px;
+}
+
+.compact .logo-subtext {
+    font-size: 10px;
+}
