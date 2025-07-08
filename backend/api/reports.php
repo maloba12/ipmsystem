@@ -78,3 +78,80 @@ try {
     http_response_code(500);
     echo json_encode(['message' => 'An error occurred: ' . $e->getMessage()]);
 }
+
+// Handle dashboard data requests
+if (isset($_GET['action'])) {
+    $action = $_GET['action'];
+
+    try {
+        switch ($action) {
+            case 'revenue':
+                // Get revenue data for the last 6 months
+                $stmt = $db->prepare("
+                    SELECT 
+                        DATE_FORMAT(p.created_at, '%Y-%m') as month,
+                        SUM(p.premium) as total_revenue
+                    FROM policies p
+                    WHERE p.created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+                    GROUP BY month
+                    ORDER BY month
+                ");
+                $stmt->execute();
+                $revenueData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Format data for chart
+                $labels = array_map(function($row) {
+                    return date('M', strtotime($row['month']));
+                }, $revenueData);
+
+                $values = array_column($revenueData, 'total_revenue');
+
+                echo json_encode([
+                    'success' => true,
+                    'data' => [
+                        'labels' => $labels,
+                        'values' => $values
+                    ]
+                ]);
+                break;
+
+            case 'users':
+                // Get user distribution
+                $stmt = $db->prepare("
+                    SELECT 
+                        CASE 
+                            WHEN role = 'Admin' THEN 'Admins'
+                            WHEN role = 'Agent' THEN 'Agents'
+                            ELSE 'Clients'
+                        END as user_type,
+                        COUNT(*) as count
+                    FROM users
+                    GROUP BY user_type
+                ");
+                $stmt->execute();
+                $userData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Format data for chart
+                $labels = array_column($userData, 'user_type');
+                $values = array_column($userData, 'count');
+
+                echo json_encode([
+                    'success' => true,
+                    'data' => [
+                        'labels' => $labels,
+                        'values' => $values
+                    ]
+                ]);
+                break;
+
+            default:
+                throw new Exception('Invalid action');
+        }
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
+    }
+}

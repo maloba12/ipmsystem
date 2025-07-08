@@ -14,26 +14,65 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// Validate CSRF token
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        header('Location: settings.php?error=invalid_token');
+        exit();
+    }
+}
+
 // Initialize SettingsController
 $settingsController = new SettingsController();
 
 // Handle POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
+    $success = false;
+    $message = '';
     
     switch ($action) {
         case 'update_profile':
-            // Handle profile updates
+            try {
+                $result = $settingsController->updateUserProfile($_POST);
+                $success = true;
+                $message = 'Profile updated successfully';
+            } catch (Exception $e) {
+                $message = 'Failed to update profile: ' . $e->getMessage();
+            }
             break;
+            
         case 'update_notifications':
-            // Handle notification preferences
+            try {
+                $result = $settingsController->updateNotificationPreferences($_POST);
+                $success = true;
+                $message = 'Notification preferences updated successfully';
+            } catch (Exception $e) {
+                $message = 'Failed to update notification preferences: ' . $e->getMessage();
+            }
             break;
+            
         case 'update_security':
-            // Handle security settings
+            try {
+                $result = $settingsController->updateSecuritySettings($_POST);
+                $success = true;
+                $message = 'Security settings updated successfully';
+            } catch (Exception $e) {
+                $message = 'Failed to update security settings: ' . $e->getMessage();
+            }
             break;
+            
         default:
+            $message = 'Invalid action';
             break;
     }
+
+    if ($success) {
+        header('Location: settings.php?success=' . urlencode($message));
+    } else {
+        header('Location: settings.php?error=' . urlencode($message));
+    }
+    exit();
 }
 
 // Get user-specific settings
@@ -242,11 +281,14 @@ switch ($userRole) {
         async function updateSettings(type, event) {
             event.preventDefault();
             const form = event.target;
+            const formData = new FormData(form);
+            formData.append('action', type);
+            formData.append('csrf_token', '<?php echo htmlspecialchars($_SESSION["csrf_token"]); ?>');
 
             try {
-                const formData = new FormData(form);
                 const response = await fetch('settings.php', {
                     method: 'POST',
+                    body: formData
                     headers: {
                         'X-CSRF-TOKEN': '<?php echo $_SESSION['csrf_token']; ?>'
                     },

@@ -1,35 +1,51 @@
 <?php
 
-class AuthController {
+use IPMS\Utils\UserValidation;
+
+class AuthController extends BaseController {
     private $db;
     private $jwt;
+    private $validator;
 
     public function __construct($db) {
         $this->db = $db;
         $this->jwt = new JWT();
+        $this->validator = new UserValidation($db);
     }
 
     public function login() {
         try {
-            // Get request data
             $data = json_decode(file_get_contents('php://input'), true);
             
-            if (!isset($data['email']) || !isset($data['password'])) {
-                http_response_code(400);
-                echo json_encode(['message' => 'Email and password are required']);
-                return;
+            // Validate input
+            $rules = [
+                'email' => ['type' => 'email'],
+                'password' => ['type' => 'password']
+            ];
+            
+            if (!$this->validateInput($data, $rules)) {
+                return $this->handleError(implode(', ', $this->errorMessages));
             }
 
-            // Get user from database
+            // Sanitize inputs
+            $sanitizedData = $this->sanitizeInput($data);
+
+            // Check if user exists
             $stmt = $this->db->prepare('SELECT * FROM users WHERE email = ?');
-            $stmt->execute([$data['email']]);
+            $stmt->execute([$sanitizedData['email']]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if (!$user || !password_verify($data['password'], $user['password'])) {
-                http_response_code(401);
-                echo json_encode(['message' => 'Invalid email or password']);
-                return;
+            if (!$user || !password_verify($sanitizedData['password'], $user['password'])) {
+                return $this->handleError('Invalid email or password', 401);
             }
+
+            if ($user['status'] !== 'active') {
+                return $this->handleError('Account is not active', 403);
+            }
+
+            // Update last login
+            $stmt = $this->db->prepare('UPDATE users SET last_login = NOW() WHERE id = ?');
+            $stmt->execute([$user['id']]);
 
             // Generate JWT token
             $token = $this->jwt->generate([
@@ -40,15 +56,19 @@ class AuthController {
 
             // Remove sensitive data
             unset($user['password']);
+            unset($user['created_at']);
+            unset($user['updated_at']);
+            unset($user['status']);
+            unset($user['last_login']);
 
-            // Return user data and token
-            echo json_encode([
+            return $this->handleSuccess([
                 'user' => $user,
                 'token' => $token
             ]);
+
         } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(['message' => 'An error occurred during login']);
+            error_log("Login error: " . $e->getMessage());
+            return $this->handleError('An error occurred during login', 500);
         }
     }
 
@@ -97,60 +117,79 @@ class AuthController {
 
     public function register() {
         try {
-            // Get request data
             $data = json_decode(file_get_contents('php://input'), true);
             
-            if (!isset($data['email']) || !isset($data['password']) || !isset($data['name'])) {
-                http_response_code(400);
-                echo json_encode(['message' => 'Email, password, and name are required']);
-                return;
+            // Validate input
+            $rules = [
+                'username' => ['type' => 'string', 'min_length' => 3, 'max_length' => 50],
+                'email' => ['type' => 'email'],
+                'password' => ['type' => 'password', 'min_length' => 8],
+                'first_name' => ['type' => 'string', 'min_length' => 2, 'max_length' => 50],
+                'last_name' => ['type' => 'string', 'min_length' => 2, 'max_length' => 50],
+                'role' => ['type' => 'role']
+            ];
+            
+            if (!$this->validateInput($data, $rules)) {
+                return $this->handleError(implode(', ', $this->errorMessages));
             }
+
+            // Sanitize inputs
+            $sanitizedData = $this->sanitizeInput($data);
 
             // Check if email already exists
             $stmt = $this->db->prepare('SELECT id FROM users WHERE email = ?');
-            $stmt->execute([$data['email']]);
+            $stmt->execute([$sanitizedData['email']]);
             if ($stmt->fetch()) {
-                http_response_code(400);
-                echo json_encode(['message' => 'Email already exists']);
-                return;
+                return $this->handleError('Email already registered');
+            }
+
+            // Check if username already exists
+            $stmt = $this->db->prepare('SELECT id FROM users WHERE username = ?');
+            $stmt->execute([$sanitizedData['username']]);
+            if ($stmt->fetch()) {
+                return $this->handleError('Username already taken');
             }
 
             // Hash password
-            $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+            $hashedPassword = password_hash($sanitizedData['password'], PASSWORD_DEFAULT);
 
             // Insert new user
-            $stmt = $this->db->prepare('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)');
+            $stmt = $this->db->prepare("
+                INSERT INTO users 
+                (username, email, password, first_name, last_name, role, status, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, 'active', NOW())
+            ");
             $stmt->execute([
-                $data['name'],
-                $data['email'],
+                $sanitizedData['username'],
+                $sanitizedData['email'],
                 $hashedPassword,
-                $data['role'] ?? 'user'
+                $sanitizedData['first_name'],
+                $sanitizedData['last_name'],
+                $sanitizedData['role']
             ]);
 
-            // Get created user
             $userId = $this->db->lastInsertId();
-            $stmt = $this->db->prepare('SELECT * FROM users WHERE id = ?');
-            $stmt->execute([$userId]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             // Generate JWT token
             $token = $this->jwt->generate([
-                'user_id' => $user['id'],
-                'email' => $user['email'],
-                'role' => $user['role']
+                'user_id' => $userId,
+                'email' => $sanitizedData['email'],
+                'role' => $sanitizedData['role']
             ]);
 
-            // Remove sensitive data
-            unset($user['password']);
+            // Get user data without password
+            $stmt = $this->db->prepare('SELECT id, username, email, first_name, last_name, role FROM users WHERE id = ?');
+            $stmt->execute([$userId]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Return user data and token
-            echo json_encode([
+            return $this->handleSuccess([
                 'user' => $user,
                 'token' => $token
             ]);
+
         } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(['message' => 'An error occurred during registration']);
+            error_log("Registration error: " . $e->getMessage());
+            return $this->handleError('An error occurred during registration', 500);
         }
     }
 

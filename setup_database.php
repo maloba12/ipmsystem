@@ -40,6 +40,48 @@ try {
     echo "<h2>IPM System Database Setup</h2>";
     echo "<p>Database: " . DB_NAME . "</p>";
     
+    // Create system_settings table
+    $systemSettingsSQL = "CREATE TABLE IF NOT EXISTS system_settings (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        category VARCHAR(50) NOT NULL,
+        setting_key VARCHAR(100) NOT NULL,
+        value TEXT,
+        description TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_setting (category, setting_key)
+    )";
+
+    createTableIfNotExists($pdo, 'system_settings', $systemSettingsSQL);
+
+    // Insert default system settings
+    try {
+        $stmt = $pdo->prepare("INSERT INTO system_settings (category, setting_key, value, description) VALUES (?, ?, ?, ?)");
+        
+        // General Settings
+        $stmt->execute(['general', 'app_name', 'IPM System', 'Name of the insurance processing system']);
+        $stmt->execute(['general', 'version', '1.0.0', 'System version number']);
+        
+        // Email Settings
+        $stmt->execute(['email', 'smtp_host', '', 'SMTP server host']);
+        $stmt->execute(['email', 'smtp_port', '587', 'SMTP server port']);
+        $stmt->execute(['email', 'smtp_user', '', 'SMTP username']);
+        $stmt->execute(['email', 'smtp_pass', '', 'SMTP password']);
+        
+        // Security Settings
+        $stmt->execute(['security', 'password_min_length', '8', 'Minimum password length']);
+        $stmt->execute(['security', 'password_expiration_days', '90', 'Number of days before password expires']);
+        $stmt->execute(['security', 'login_attempts', '5', 'Number of allowed login attempts before lockout']);
+        
+        // Display Settings
+        $stmt->execute(['display', 'theme', 'light', 'System theme (light/dark)']);
+        $stmt->execute(['display', 'language', 'en', 'Default language']);
+        
+        echo "<p style='color: green;'>✓ Default system settings inserted successfully</p>";
+    } catch (PDOException $e) {
+        echo "<p style='color: red;'>✗ Failed to insert default settings: " . $e->getMessage() . "</p>";
+    }
+
     // Create clients table
     $clientsSQL = "CREATE TABLE IF NOT EXISTS clients (
         id INT PRIMARY KEY AUTO_INCREMENT,
